@@ -19,8 +19,13 @@ package org.hoidla.db;
 
 public class DataValue {
 	private String key;
-	private byte[] value; 
+	private short dataType;
+	private Object value; 
 	private String comment;
+	
+	public static final short TYPE_BYTE_ARRAY = 0;
+	public static final short TYPE_STRING = 1;
+	public static final short TYPE_TUPLE = 2;
 	
 	public String getKey() {
 		return key;
@@ -28,11 +33,17 @@ public class DataValue {
 	public void setKey(String key) {
 		this.key = key;
 	}
-	public byte[] getValue() {
+	public Object getValue() {
 		return value;
 	}
-	public void setValue(byte[] value) {
+	public void setValue(Object value) {
 		this.value = value;
+	}
+	public short getDataType() {
+		return dataType;
+	}
+	public void setDataType(short dataType) {
+		this.dataType = dataType;
 	}
 	public String getComment() {
 		return comment;

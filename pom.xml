@@ -96,6 +96,12 @@ xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/ma
             <version>${jackson.version}</version>
         </dependency>
         
+         <dependency>
+            <groupId>mawazo</groupId>
+            <artifactId>chombo</artifactId>
+            <version>1.0</version>
+        </dependency>
+ 
     </dependencies>
 
     <repositories>

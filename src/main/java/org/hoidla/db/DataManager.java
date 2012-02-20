@@ -23,12 +23,17 @@ import java.util.Map;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.Path;
+import org.hoidla.serde.SerDes;
+import org.hoidla.serde.StringSerDes;
+import org.hoidla.serde.TupleSerDes;
 
 
 public class DataManager  {
 	private String dataManagerPath;
 	private Configuration config;
 	private Map<String, DataStore> stores = new HashMap<String, DataStore>();
+	private Map<Short, SerDes> sdMap = new HashMap<Short, SerDes>();
+	
 	private static DataManager dataManager;
 	
 	public static DataManager instance() {
@@ -41,6 +46,18 @@ public class DataManager  {
 	public void initialize(String dataManagerPath, Configuration config) {
 		this.dataManagerPath = dataManagerPath;
 		this.config = config;
+		
+		//default serde
+		sdMap.put(DataValue.TYPE_STRING, new StringSerDes());
+		sdMap.put(DataValue.TYPE_TUPLE, new TupleSerDes());
+	}
+	
+	public SerDes getSerDes(short type){
+		return  sdMap.get(type);
+	}
+	
+	public void setSerDes(Short type, SerDes sd) {
+		sdMap.put(type, sd);
 	}
 	
 	public DataStore createDataStore(String dataStoreName) {

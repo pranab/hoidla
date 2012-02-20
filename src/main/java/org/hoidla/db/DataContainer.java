@@ -22,12 +22,12 @@ import java.io.IOException;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.SequenceFile;
+import org.hoidla.serde.SerDes;
 
 public class DataContainer {
 		private String name;
 		private Path storePath;
 		private SequenceFile.Writer writer;
-		
 		
 		public DataContainer(String name, Path storePath) {
 			super();
@@ -42,9 +42,23 @@ public class DataContainer {
 		}
 		
 		public void put( DataValue dataValue) throws IOException {
+			byte[] bytes = null;
 			getWriter();
+			//key
 			KeyWritable keyWr = new KeyWritable(dataValue.getKey(), System.currentTimeMillis(),  KeyWritable.UPDATE_OPCODE);
-			ValueWritable valWr = new ValueWritable(dataValue.getValue(), dataValue.getComment());
+			
+			//value
+			if (dataValue.getDataType() == DataValue.TYPE_BYTE_ARRAY) {
+				bytes = (byte[])dataValue.getValue();
+			} else {
+				SerDes sd = DataManager.instance().getSerDes(dataValue.getDataType());
+				if (null == sd){
+					throw new IOException("Write failed , no serde found for data type " + dataValue.getDataType());
+				}
+				bytes = sd.serialize(dataValue.getValue());
+			}
+			ValueWritable valWr = new ValueWritable(bytes, dataValue.getComment());
+			
 			writer.append(keyWr, valWr);
 		} 
 		
@@ -65,7 +79,7 @@ public class DataContainer {
 							keyClazz, valClazz);
 				} 
 			} catch (ClassNotFoundException e) {
-				throw new IOException("", e);
+				throw new IOException("Failed to create container file ", e);
 			}
 			
 			return writer;

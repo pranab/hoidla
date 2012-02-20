@@ -32,10 +32,6 @@ public class DataStore {
 		this.path = path;
 	}
 	
-	public void createContainer(String dataContainerName) {
-		
-	}
-	
 	public DataContainer getContainer(String dataContainerName) {
 		DataContainer container = containers.get(dataContainerName);
 		if (null == container) {
@@ -55,8 +51,6 @@ public class DataStore {
 		
 		return dataValue;
 	}
-	
-	
 	
 	public void close(String dataContainerName) {
 		
