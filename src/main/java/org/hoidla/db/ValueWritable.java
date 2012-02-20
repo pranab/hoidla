@@ -49,4 +49,7 @@ public class ValueWritable  implements Writable {
 		comment.write(out);
 	}
 
+	public byte[] getValue() {
+		return value.getBytes();
+	}
 }

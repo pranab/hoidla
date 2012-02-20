@@ -18,10 +18,16 @@
 package org.hoidla.db;
 
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.Comparator;
 
+import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
+import org.apache.hadoop.io.IOUtils;
 import org.apache.hadoop.io.SequenceFile;
+import org.apache.hadoop.util.ReflectionUtils;
 import org.hoidla.serde.SerDes;
 
 public class DataContainer {
@@ -30,24 +36,66 @@ public class DataContainer {
 		private SequenceFile.Writer writer;
 		
 		public DataContainer(String name, Path storePath) {
-			super();
 			this.name = name;
 			this.storePath = storePath;
 		}
 
-		public DataValue  get(String key)  {
-			DataValue dataValue  = null;
+		public void  get( DataValue dataValue)  throws IOException {
+			Path filesPath = new  Path(storePath, "*");
+			FileSystem fileSys = storePath.getFileSystem(DataManager.instance().getConfig());
+			FileStatus[] fileStats = fileSys.globStatus(filesPath);
+			Configuration config = DataManager.instance().getConfig();
 			
-			return dataValue;
+			if (fileStats != null && fileStats.length > 0) {
+				KeyWritable keyWr = null;
+				ValueWritable valueWr = null;
+				SequenceFile.Reader reader = null;
+				
+	            if ( fileStats.length > 1 ) {
+	            	Arrays.sort(fileStats, new FilelatestComparator()    );
+	            }
+	
+				for (FileStatus fileStat : fileStats) {
+					if (fileStat.getPath().getName().startsWith(name)) {
+						reader = new SequenceFile.Reader(fileSys, fileStat.getPath(), config);
+	                	keyWr = (KeyWritable) ReflectionUtils.newInstance(reader.getKeyClass(), config);
+	                	valueWr = (ValueWritable) ReflectionUtils.newInstance(reader.getValueClass(), config);	
+	                	
+	                	while(reader.next(keyWr, valueWr)) {
+	                		if (keyWr.getKey().equals(dataValue.getKey())) {
+	                			byte[] bytes = valueWr.getValue();
+	                			if (dataValue.getDataType() == DataValue.TYPE_BYTE_ARRAY) {
+	                				dataValue.setValue(bytes);
+	                			} else {
+	                				SerDes sd = DataManager.instance().getSerDes(dataValue.getDataType());
+	                				if (null == sd){
+	                					throw new IOException("Read failed , no serde found for data type " + dataValue.getDataType());
+	                				}
+	                				Object value = sd.deserialize(bytes);
+	                				dataValue.setValue(value);
+	                			}
+	                			break;
+	                		}
+		                	keyWr = (KeyWritable) ReflectionUtils.newInstance(reader.getKeyClass(), config);
+		                	valueWr = (ValueWritable) ReflectionUtils.newInstance(reader.getValueClass(), config);	
+	                		
+	                	}
+                    	IOUtils.closeStream(reader);
+                    	reader = null;
+                		if (null != dataValue.getValue()) {
+                			break;
+                		}
+					} 
+				}
+			}
 		}
 		
 		public void put( DataValue dataValue) throws IOException {
 			byte[] bytes = null;
 			getWriter();
-			//key
-			KeyWritable keyWr = new KeyWritable(dataValue.getKey(), System.currentTimeMillis(),  KeyWritable.UPDATE_OPCODE);
 			
-			//value
+			//key and value
+			KeyWritable keyWr = new KeyWritable(dataValue.getKey(), System.currentTimeMillis(),  KeyWritable.UPDATE_OPCODE);
 			if (dataValue.getDataType() == DataValue.TYPE_BYTE_ARRAY) {
 				bytes = (byte[])dataValue.getValue();
 			} else {
@@ -84,5 +132,11 @@ public class DataContainer {
 			
 			return writer;
 		}
+		
+	    private static class FilelatestComparator implements Comparator<FileStatus> {
+	        public int compare(FileStatus file1, FileStatus file2) {
+	        	return Long.valueOf(file2.getModificationTime()).compareTo(file1.getModificationTime()) ;
+	        }
+	    }	    
 		
 }

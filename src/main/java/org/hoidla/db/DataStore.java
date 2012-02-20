@@ -17,6 +17,7 @@
 
 package org.hoidla.db;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -46,10 +47,9 @@ public class DataStore {
 		container.put( dataValue);
 	}
 	
-	public DataValue get(String dataContainerName, String key) {
-		DataValue dataValue = new DataValue();
-		
-		return dataValue;
+	public void get(String dataContainerName, DataValue dataValue) throws IOException {
+		DataContainer container = getContainer(dataContainerName);
+		container.get(dataValue);
 	}
 	
 	public void close(String dataContainerName) {

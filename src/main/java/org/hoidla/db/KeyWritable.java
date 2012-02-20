@@ -56,5 +56,9 @@ public class KeyWritable implements Writable {
 		opCode.write(out);
 		
 	}
+	
+	public String getKey() {
+		return key.toString();
+	}
 
 }
