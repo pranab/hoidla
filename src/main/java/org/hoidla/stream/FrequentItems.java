@@ -1,5 +1,5 @@
 /*
- * hoidla: various algorithms
+ * hoidla: various algorithms for Big Data solutions
  * Author: Pranab Ghosh
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); you
@@ -22,6 +22,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.hoidla.util.Expirer;
+
 /**
  * Probabilistic frequent count algorithms
  * @author pranab
@@ -33,12 +35,22 @@ public class FrequentItems {
 		private Map<String, Integer> buckets = new HashMap<String, Integer>(); 
 		private int maxBucket;
 		private List<String> toBeRemoved = new ArrayList<String>(); 
-		
+		private Map<String, List<Long>> timestampedBuckets = new HashMap<String, List<Long>>(); 
+		private Expirer expirer;
+
+		/**
+		 * @param maxBucket
+		 */
 		public MisraGries(int maxBucket ) {
 			this.maxBucket = maxBucket;
 		}
 		
+		public void setExpirer(Expirer expirer) {
+			this.expirer = expirer;
+		}
+
 		/**
+		 * add item
 		 * @param value
 		 */
 		public void add(String value) {
@@ -57,6 +69,43 @@ public class FrequentItems {
 					if (newCount > 0) {
 						buckets.put(key, newCount);
 					} else {
+						toBeRemoved.add(key);
+					}
+				}
+				for (String key : toBeRemoved) {
+					buckets.remove(key);
+				}
+			}
+		}
+
+		/**
+		 * add with time window based expiry
+		 * @param value
+		 */
+		public void add(String value, long timestamp) {
+			//expire old
+			if (null != expirer) {
+				for (String key : timestampedBuckets.keySet()) {
+					List<Long> tsList = timestampedBuckets.get(key);
+					expirer.expire(tsList, timestamp);
+				}				
+			}
+			
+			//add
+			List<Long> timetsamps = timestampedBuckets.get(value);
+			if (null != timetsamps) {
+				//existing
+				timetsamps.add(timestamp);
+			} else if (timestampedBuckets.size() <  maxBucket) {
+				//add to buckets
+				timestampedBuckets.put(value, new ArrayList<Long>());
+			} else {
+				//remove oldest in each bucket
+				toBeRemoved.clear();
+				for (String key : timestampedBuckets.keySet()) {
+					List<Long> tsList = timestampedBuckets.get(key);
+					tsList.remove(0);
+					if (tsList.isEmpty()) { 
 						toBeRemoved.add(key);
 					}
 				}
