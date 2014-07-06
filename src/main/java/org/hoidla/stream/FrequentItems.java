@@ -32,10 +32,33 @@ import org.hoidla.util.Expirer;
  */
 public class FrequentItems {
 	
+	/**
+	 * @param strategy
+	 * @param maxBucket
+	 * @param expireWindow
+	 * @return
+	 */
 	public static FrequentItemsFinder<String> createWithStringType(String strategy, int maxBucket, long expireWindow) {
 		FrequentItemsFinder<String> freqFinder = null;
 		if (strategy.equals("MisraGries")) {
 			freqFinder = new MisraGries<String>(maxBucket);
+			if (expireWindow > 0) {
+				freqFinder.setExpirer(new Expirer(expireWindow));
+			}
+		}
+		return freqFinder;
+	}
+
+	/**
+	 * @param strategy
+	 * @param maxBucket
+	 * @param expireWindow
+	 * @return
+	 */
+	public static FrequentItemsFinder<Integer> createWithIntegerType(String strategy, int maxBucket, long expireWindow) {
+		FrequentItemsFinder<Integer> freqFinder = null;
+		if (strategy.equals("MisraGries")) {
+			freqFinder = new MisraGries<Integer>(maxBucket);
 			if (expireWindow > 0) {
 				freqFinder.setExpirer(new Expirer(expireWindow));
 			}
