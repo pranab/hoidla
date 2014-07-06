@@ -43,12 +43,32 @@ public class FrequencyDistribution {
 		
 		//large prime
 		protected int c = 1000099;
+
+		/** 
+		 * Constructor based on error bounds
+		 * @param errorLimit
+		 * @param errorProbLimit
+		 */
+		public CountMinSketch(double errorLimit, double errorProbLimit) {
+			width = (int)Math.round(2.0 / errorLimit);
+			depth = (int)Math.round(Math.log(errorProbLimit));
+			initialize(width, depth);
+		}	
 		
 		/**
+		 * Constructor  base of number of hash functions and hash value range
 		 * @param width
 		 * @param depth
 		 */
 		public CountMinSketch(int width, int depth) {
+			initialize(width, depth);
+		}
+
+		/**
+		 * @param width
+		 * @param depth
+		 */
+		public void initialize(int width, int depth) {
 			this.width = width;
 			this.depth = depth;
 			sketch = new int[depth][width];
@@ -64,7 +84,7 @@ public class FrequencyDistribution {
 				}
 			}
 		}
-
+			
 		/**
 		 * Adds a value
 		 * @param value
