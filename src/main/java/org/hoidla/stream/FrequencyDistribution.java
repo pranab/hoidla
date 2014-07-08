@@ -31,7 +31,7 @@ public class FrequencyDistribution {
 	 * @author pranab
 	 *
 	 */
-	public static abstract class CountMinSketch{
+	public static  class CountMinSketch{
 		//sketch
 		protected int width;
 		protected int depth;
@@ -118,69 +118,34 @@ public class FrequencyDistribution {
 		 * @param d  
 		 * @return
 		 */
-		protected abstract int hash(Object value, int d);
+		protected  int hash(Object value, int d) {
+			int hashCode = 0;
+			if (value instanceof String) {
+				byte[] bytes = null;
+				try {
+					bytes = ((String)value).getBytes("utf-8");
+				} catch (UnsupportedEncodingException e) {
+					throw new IllegalArgumentException("failed to decode string into byte array" + e.getMessage());
+				}
+				int accum = 0;
+				for (int i =0; i < bytes.length; ++i) {
+					accum ^= bytes[i] * a[d];
+				}
+				accum ^= b[d];
+				hashCode =  (accum % c) % width;
+			} else if (value instanceof Integer) {
+				Integer valInt = (Integer)value;
+				int accum = 0;
+				for (int i =0; i < 4; ++i) {
+					accum ^= (valInt & 0x000F)  * a[d];
+					valInt >>= 8;
+				}
+				accum ^= b[d];
+				hashCode =  (accum % c) % width;
+			}
+			return hashCode;
+		}
 
 	}
 
-	/**
-	 * @author pranab
-	 *
-	 */
-	public static class CountMinSketchString extends CountMinSketch {
-		
-		/**
-		 * @param width
-		 * @param depth
-		 */
-		public CountMinSketchString(int width, int depth) {
-			super(width, depth);
-		}
-		
-		/* (non-Javadoc)
-		 * @see org.hoidla.stream.FrequencyDistribution.CountMinSketch#hash(java.lang.Object, int)
-		 */
-		protected int hash(Object value, int d) {
-			byte[] bytes = null;
-			try {
-				bytes = ((String)value).getBytes("utf-8");
-			} catch (UnsupportedEncodingException e) {
-				throw new IllegalArgumentException("failed to decode string into byte array" + e.getMessage());
-			}
-			int accum = 0;
-			for (int i =0; i < bytes.length; ++i) {
-				accum ^= bytes[i] * a[d];
-			}
-			accum ^= b[d];
-			return (accum % c) % width;
-		}
-	}
-
-	/**
-	 * @author pranab
-	 *
-	 */
-	public static class CountMinSketchInteger extends CountMinSketch {
-		
-		/**
-		 * @param width
-		 * @param depth
-		 */
-		public CountMinSketchInteger(int width, int depth) {
-			super(width, depth);
-		}
-		
-		/* (non-Javadoc)
-		 * @see org.hoidla.stream.FrequencyDistribution.CountMinSketch#hash(java.lang.Object, int)
-		 */
-		protected int hash(Object value, int d) {
-			Integer valInt = (Integer)value;
-			int accum = 0;
-			for (int i =0; i < 4; ++i) {
-				accum ^= (valInt & 0x000F)  * a[d];
-				valInt >>= 8;
-			}
-			accum ^= b[d];
-			return (accum % c) % width;
-		}
-	}
 }

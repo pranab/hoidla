@@ -32,18 +32,32 @@ import org.hoidla.util.Expirer;
  */
 public class FrequentItems {
 	
+	public static class Context {
+		private String strategy;
+		private int maxBucket;  
+		private long expireWindow;
+		private double errorLimit;
+		private double errorProbLimit; 
+		private int mostFrequentCount;
+	}
+	
 	/**
 	 * @param strategy
 	 * @param maxBucket
 	 * @param expireWindow
 	 * @return
 	 */
-	public static FrequentItemsFinder<String> createWithStringType(String strategy, int maxBucket, long expireWindow) {
+	public static FrequentItemsFinder<String> createWithStringType(FrequentItems.Context context) {
 		FrequentItemsFinder<String> freqFinder = null;
-		if (strategy.equals("MisraGries")) {
-			freqFinder = new MisraGries<String>(maxBucket);
-			if (expireWindow > 0) {
-				freqFinder.setExpirer(new Expirer(expireWindow));
+		if (context.strategy.equals("MisraGries")) {
+			freqFinder = new MisraGries<String>(context.maxBucket);
+			if (context.expireWindow > 0) {
+				freqFinder.setExpirer(new Expirer(context.expireWindow));
+			}
+		} else if (context.strategy.equals("CountMinSketches")) {
+			freqFinder = new CountMinSketchesString(context.errorLimit, context.errorProbLimit, context.mostFrequentCount);
+			if (context.expireWindow > 0) {
+				freqFinder.setExpirer(new Expirer(context.expireWindow));
 			}
 		}
 		return freqFinder;
@@ -184,6 +198,96 @@ public class FrequentItems {
 				}				
 			}
 			return orderItems;
+		}
+		
+	}
+	
+	/**
+	 * @author pranab
+	 *
+	 */
+	public static class CountMinSketchesCounter  {
+		protected Expirer expirer;
+		protected FrequencyDistribution.CountMinSketch minSketches;
+		protected TreeMap<Integer, Object> orderedItems = new TreeMap<Integer, Object>();
+		protected int mostFrequentCount;
+	
+		/**
+		 * @param errorLimit
+		 * @param errorProbLimit
+		 * @param mostFrequentCount
+		 */
+		public CountMinSketchesCounter(double errorLimit, double errorProbLimit, int mostFrequentCount) {
+			minSketches = new FrequencyDistribution.CountMinSketch(errorLimit,  errorProbLimit);
+			this.mostFrequentCount = mostFrequentCount;
+		}
+		
+		/**
+		 * @param expirer
+		 */
+		public void setExpirer(Expirer expirer) {
+			this.expirer = expirer;
+		}
+
+		/**
+		 * @param value
+		 */
+		protected void trackCount(Object value) {
+			//get frequency count and store in tree map
+			int count = minSketches.getDistr(value);
+			orderedItems.put(count, value);
+			if (orderedItems.size() > mostFrequentCount) {
+				Integer smallestKey = orderedItems.firstKey();
+				orderedItems.remove(smallestKey);
+			}
+		}
+		
+	}
+	
+	/**
+	 * @author pranab
+	 *
+	 */
+	public static class CountMinSketchesString  extends CountMinSketchesCounter  
+		implements FrequentItemsFinder<String>{
+
+		/**
+		 * @param errorLimit
+		 * @param errorProbLimit
+		 * @param mostFrequentCount
+		 */
+		public CountMinSketchesString(double errorLimit, double errorProbLimit, int mostFrequentCount) {
+			super(errorLimit, errorProbLimit, mostFrequentCount);
+		}
+
+		/* (non-Javadoc)
+		 * @see org.hoidla.stream.FrequentItems.FrequentItemsFinder#add(java.lang.Object)
+		 */
+		@Override
+		public void add(String value) {
+			minSketches.add(value);
+			trackCount(value);
+		}
+		
+		/* (non-Javadoc)
+		 * @see org.hoidla.stream.FrequentItems.FrequentItemsFinder#add(java.lang.Object, long)
+		 */
+		@Override
+		public void add(String value, long timestamp) {
+			// TODO Auto-generated method stub
+			
+		}
+
+		/* (non-Javadoc)
+		 * @see org.hoidla.stream.FrequentItems.FrequentItemsFinder#get()
+		 */
+		@Override
+		public Map<Integer, String> get() {
+			TreeMap<Integer, String> orderedItems = new TreeMap<Integer, String>();
+			for (Integer key :  this.orderedItems.keySet()) {
+				orderedItems.put(key, (String)this.orderedItems.get(key));
+			}
+			return orderedItems;
 		}
 		
 	}
