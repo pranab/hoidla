@@ -24,7 +24,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
-import org.hoidla.stream.FrequentItems.FrequentItemsFinder;
 import org.hoidla.util.Expirer;
 import org.hoidla.util.ObjectCounter;
 import org.hoidla.util.SequencedObjectCounter;
@@ -35,10 +34,10 @@ import org.hoidla.util.SimpleObjectCounter;
  *
  * @param <T>
  */
-public class MisraGriesFrequent<T>  implements FrequentItems.FrequentItemsFinder<T> {
-	private Map<T, ObjectCounter> buckets = new HashMap<T, ObjectCounter>(); 
+public class MisraGriesFrequent<T>  implements FrequentItems.FrequentItemsFinder {
+	private Map<Object, ObjectCounter> buckets = new HashMap<Object, ObjectCounter>(); 
 	private int maxBucket;
-	private List<T> toBeRemoved = new ArrayList<T>(); 
+	private List<Object> toBeRemoved = new ArrayList<Object>(); 
 	private Expirer expirer;
 
 	/**
@@ -56,7 +55,7 @@ public class MisraGriesFrequent<T>  implements FrequentItems.FrequentItemsFinder
 	 * add item
 	 * @param value
 	 */
-	public void add(T value) {
+	public void add(Object value) {
 		ObjectCounter counter = buckets.get(value);
 		if (null != counter) {
 			//existing bucket
@@ -76,11 +75,11 @@ public class MisraGriesFrequent<T>  implements FrequentItems.FrequentItemsFinder
 	 * add with time window based expiry
 	 * @param value
 	 */
-	public void add(T value, long timestamp) {
+	public void add(Object value, long timestamp) {
 		//expire old 
 		ObjectCounter counter = null;
 		if (null != expirer) {
-			for (T key : buckets.keySet()) {
+			for (Object key : buckets.keySet()) {
 				counter = buckets.get(key);
 				counter.expire(expirer, timestamp);
 			}				
@@ -108,14 +107,14 @@ public class MisraGriesFrequent<T>  implements FrequentItems.FrequentItemsFinder
 	private void decrementAll() {
 		ObjectCounter counter = null;
 		toBeRemoved.clear();
-		for (T key : buckets.keySet()) {
+		for (Object key : buckets.keySet()) {
 			counter = buckets.get(key);
 			counter.decrement();
 			if (counter.isZero()) {
 				toBeRemoved.add(key);
 			}
 		}
-		for (T key : toBeRemoved) {
+		for (Object key : toBeRemoved) {
 			buckets.remove(key);
 		}
 	}
@@ -124,9 +123,9 @@ public class MisraGriesFrequent<T>  implements FrequentItems.FrequentItemsFinder
 	 * 
 	 * @return items ordered by count
 	 */
-	public Map<Integer, T> get() {
-		TreeMap<Integer, T> orderItems = new TreeMap<Integer, T>();
-		for (T key : buckets.keySet()) {
+	public Map<Integer, Object> get() {
+		TreeMap<Integer, Object> orderItems = new TreeMap<Integer, Object>();
+		for (Object key : buckets.keySet()) {
 			orderItems.put(buckets.get(key).getCount(), key);
 		}				
 		return orderItems;

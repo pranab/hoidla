@@ -47,52 +47,32 @@ public class FrequentItems {
 	 * @param expireWindow
 	 * @return
 	 */
-	public static FrequentItemsFinder<String> createWithStringType(FrequentItems.Context context) {
-		FrequentItemsFinder<String> freqFinder = null;
+	public static FrequentItemsFinder create(FrequentItems.Context context) {
+		FrequentItemsFinder freqFinder = null;
 		if (context.strategy.equals("MisraGries")) {
 			freqFinder = new MisraGriesFrequent<String>(context.maxBucket);
 			if (context.expireWindow > 0) {
 				freqFinder.setExpirer(new Expirer(context.expireWindow));
 			}
 		} else if (context.strategy.equals("CountMinSketches")) {
-			freqFinder = new CountMinSketchesFrequent.CountMinSketchesString(
-					context.errorLimit, context.errorProbLimit, context.mostFrequentCount);
 			if (context.expireWindow > 0) {
-				freqFinder.setExpirer(new Expirer(context.expireWindow));
+				freqFinder = new CountMinSketchesFrequent(context.errorLimit, context.errorProbLimit, 
+						context.mostFrequentCount, new Expirer(context.expireWindow));
+			} else {
+				freqFinder = new CountMinSketchesFrequent(context.errorLimit, context.errorProbLimit, 
+						context.mostFrequentCount);
 			}
 		}
 		return freqFinder;
 	}
 
-	/**
-	 * @param strategy
-	 * @param maxBucket
-	 * @param expireWindow
-	 * @return
-	 */
-	public static FrequentItemsFinder<Integer> createWithIntegerType(FrequentItems.Context context) {
-		FrequentItemsFinder<Integer> freqFinder = null;
-		if (context.strategy.equals("MisraGries")) {
-			freqFinder = new MisraGriesFrequent<Integer>(context.maxBucket);
-			if (context.expireWindow > 0) {
-				freqFinder.setExpirer(new Expirer(context.expireWindow));
-			}
-		} else if (context.strategy.equals("CountMinSketches")) {
-			freqFinder = new CountMinSketchesFrequent.CountMinSketchesInteger(
-					context.errorLimit, context.errorProbLimit, context.mostFrequentCount);
-			if (context.expireWindow > 0) {
-				freqFinder.setExpirer(new Expirer(context.expireWindow));
-			}
-		}
-		return freqFinder;
-	}
 
 	/**
 	 * @author pranab
 	 *
 	 * @param <T>
 	 */
-	public static interface FrequentItemsFinder<T> {
+	public static interface FrequentItemsFinder {
 		
 		/**
 		 * @param expirer
@@ -102,17 +82,17 @@ public class FrequentItems {
 		/**
 		 * @param value
 		 */
-		public void add(T value);
+		public void add(Object value);
 		
 		/**
 		 * @param value
 		 * @param timestamp
 		 */
-		public void add(T value, long timestamp);
+		public void add(Object value, long timestamp);
 		
 		/**
 		 * @return
 		 */
-		public Map<Integer, T> get();
+		public Map<Integer, Object> get();
 	}
 }

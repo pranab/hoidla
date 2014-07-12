@@ -23,143 +23,66 @@ import java.util.TreeMap;
 import org.hoidla.stream.FrequentItems.FrequentItemsFinder;
 import org.hoidla.util.Expirer;
 
-public class CountMinSketchesFrequent {
-	/**
-	 * @author pranab
-	 *
-	 */
-	public static class CountMinSketchesCounter  {
-		protected Expirer expirer;
-		protected FrequencyDistribution.CountMinSketch minSketches;
-		protected TreeMap<Integer, Object> orderedItems = new TreeMap<Integer, Object>();
-		protected int mostFrequentCount;
-	
-		/**
-		 * @param errorLimit
-		 * @param errorProbLimit
-		 * @param mostFrequentCount
-		 */
-		public CountMinSketchesCounter(double errorLimit, double errorProbLimit, int mostFrequentCount) {
-			minSketches = new FrequencyDistribution.CountMinSketch(errorLimit,  errorProbLimit);
-			this.mostFrequentCount = mostFrequentCount;
-		}
-		
-		/**
-		 * @param expirer
-		 */
-		public void setExpirer(Expirer expirer) {
-			this.expirer = expirer;
-		}
+public class CountMinSketchesFrequent  implements FrequentItems.FrequentItemsFinder {
+	protected Expirer expirer;
+	protected CountMinSketch minSketches;
+	protected TreeMap<Integer, Object> orderedItems = new TreeMap<Integer, Object>();
+	protected int mostFrequentCount;
 
-		/**
-		 * @param value
-		 */
-		protected void trackCount(Object value) {
-			//get frequency count and store in tree map
-			int count = minSketches.getDistr(value);
-			orderedItems.put(count, value);
-			if (orderedItems.size() > mostFrequentCount) {
-				Integer smallestKey = orderedItems.firstKey();
-				orderedItems.remove(smallestKey);
-			}
-		}
-		
+	/**
+	 * @param errorLimit
+	 * @param errorProbLimit
+	 * @param mostFrequentCount
+	 */
+	public CountMinSketchesFrequent(double errorLimit, double errorProbLimit, int mostFrequentCount) {
+		minSketches = new CountMinSketch(errorLimit,  errorProbLimit);
+		this.mostFrequentCount = mostFrequentCount;
 	}
 	
+	public CountMinSketchesFrequent(double errorLimit, double errorProbLimit, int mostFrequentCount,
+			Expirer expirer) {
+		minSketches = new CountMinSketch(errorLimit,  errorProbLimit, expirer);
+		this.mostFrequentCount = mostFrequentCount;
+	}
+
+	/*
 	/**
-	 * @author pranab
-	 *
+	 * @param expirer
 	 */
-	public static class CountMinSketchesString  extends CountMinSketchesCounter  
-		implements FrequentItemsFinder<String>{
+	public void setExpirer(Expirer expirer) {
+		this.expirer = expirer;
+	}
 
-		/**
-		 * @param errorLimit
-		 * @param errorProbLimit
-		 * @param mostFrequentCount
-		 */
-		public CountMinSketchesString(double errorLimit, double errorProbLimit, int mostFrequentCount) {
-			super(errorLimit, errorProbLimit, mostFrequentCount);
-		}
+	public void add(Object value) {
+		minSketches.add(value);
+		trackCount(value);
+	}
 
-		/* (non-Javadoc)
-		 * @see org.hoidla.stream.FrequentItems.FrequentItemsFinder#add(java.lang.Object)
-		 */
-		@Override
-		public void add(String value) {
-			minSketches.add(value);
-			trackCount(value);
-		}
-		
-		/* (non-Javadoc)
-		 * @see org.hoidla.stream.FrequentItems.FrequentItemsFinder#add(java.lang.Object, long)
-		 */
-		@Override
-		public void add(String value, long timestamp) {
-			// TODO Auto-generated method stub
-			
-		}
-
-		/* (non-Javadoc)
-		 * @see org.hoidla.stream.FrequentItems.FrequentItemsFinder#get()
-		 */
-		@Override
-		public Map<Integer, String> get() {
-			TreeMap<Integer, String> orderedItems = new TreeMap<Integer, String>();
-			for (Integer key :  this.orderedItems.keySet()) {
-				orderedItems.put(key, (String)this.orderedItems.get(key));
-			}
-			return orderedItems;
-		}
-		
+	public void add(Object value, long sequence) {
+		minSketches.add(value, sequence);
+		trackCount(value);
 	}
 
 	/**
-	 * @author pranab
-	 *
+	 * @param value
 	 */
-	public static class CountMinSketchesInteger  extends CountMinSketchesCounter  
-		implements FrequentItemsFinder<Integer>{
+	protected void trackCount(Object value) {
+		//get frequency count and store in tree map
+		int count = minSketches.getDistr(value);
+		orderedItems.put(count, value);
+		if (orderedItems.size() > mostFrequentCount) {
+			Integer smallestKey = orderedItems.firstKey();
+			orderedItems.remove(smallestKey);
+		}
+	}
 
-		/**
-		 * @param errorLimit
-		 * @param errorProbLimit
-		 * @param mostFrequentCount
-		 */
-		public CountMinSketchesInteger(double errorLimit, double errorProbLimit, int mostFrequentCount) {
-			super(errorLimit, errorProbLimit, mostFrequentCount);
+	@Override
+	public Map<Integer, Object> get() {
+		TreeMap<Integer, Object> orderedItems = new TreeMap<Integer, Object>();
+		for (Integer key :  this.orderedItems.keySet()) {
+			orderedItems.put(key, this.orderedItems.get(key));
 		}
-
-		/* (non-Javadoc)
-		 * @see org.hoidla.stream.FrequentItems.FrequentItemsFinder#add(java.lang.Object)
-		 */
-		@Override
-		public void add(Integer value) {
-			minSketches.add(value);
-			trackCount(value);
-		}
-		
-		/* (non-Javadoc)
-		 * @see org.hoidla.stream.FrequentItems.FrequentItemsFinder#add(java.lang.Object, long)
-		 */
-		@Override
-		public void add(Integer value, long timestamp) {
-			// TODO Auto-generated method stub
-			
-		}
-
-		/* (non-Javadoc)
-		 * @see org.hoidla.stream.FrequentItems.FrequentItemsFinder#get()
-		 */
-		@Override
-		public Map<Integer, Integer> get() {
-			TreeMap<Integer, Integer> orderedItems = new TreeMap<Integer, Integer>();
-			for (Integer key :  this.orderedItems.keySet()) {
-				orderedItems.put(key, (Integer)this.orderedItems.get(key));
-			}
-			return orderedItems;
-		}
-		
+		return orderedItems;
 	}
 	
 }

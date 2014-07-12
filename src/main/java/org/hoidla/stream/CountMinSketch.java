@@ -171,6 +171,8 @@ public class CountMinSketch {
 			}
 			accum ^= b[d];
 			hashCode =  (accum % c) % width;
+		} else {
+			throw new IllegalArgumentException("unsupported item type for count min sketch");
 		}
 		return hashCode;
 	}
