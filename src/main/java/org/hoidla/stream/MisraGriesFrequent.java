@@ -34,12 +34,13 @@ import org.hoidla.util.SimpleObjectCounter;
  *
  * @param <T>
  */
-public class MisraGriesFrequent<T>  implements FrequentItems.FrequentItemsFinder {
+public class MisraGriesFrequent  implements FrequentItems.FrequentItemsFinder {
 	private Map<Object, ObjectCounter> buckets = new HashMap<Object, ObjectCounter>(); 
 	private int maxBucket;
 	private List<Object> toBeRemoved = new ArrayList<Object>(); 
 	private Expirer expirer;
-
+	private List<Object> toBeExpired = new ArrayList<Object>();
+	
 	/**
 	 * @param maxBucket
 	 */
@@ -72,17 +73,25 @@ public class MisraGriesFrequent<T>  implements FrequentItems.FrequentItemsFinder
 	}
 
 	/**
-	 * add with time window based expiry
+	 * add with  window based expiry
 	 * @param value
 	 */
 	public void add(Object value, long timestamp) {
 		//expire old 
 		ObjectCounter counter = null;
 		if (null != expirer) {
+			toBeExpired.clear();
 			for (Object key : buckets.keySet()) {
 				counter = buckets.get(key);
 				counter.expire(expirer, timestamp);
+				
+				if (counter.isZero()) {
+					toBeExpired.add(key);
+				}
 			}				
+			for (Object item :  toBeExpired) {
+				buckets.remove(item);
+			}
 		}
 		
 		//add

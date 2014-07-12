@@ -42,6 +42,7 @@ public class FrequentItems {
 	}
 	
 	/**
+	 * factory method 
 	 * @param strategy
 	 * @param maxBucket
 	 * @param expireWindow
@@ -50,7 +51,7 @@ public class FrequentItems {
 	public static FrequentItemsFinder create(FrequentItems.Context context) {
 		FrequentItemsFinder freqFinder = null;
 		if (context.strategy.equals("MisraGries")) {
-			freqFinder = new MisraGriesFrequent<String>(context.maxBucket);
+			freqFinder = new MisraGriesFrequent(context.maxBucket);
 			if (context.expireWindow > 0) {
 				freqFinder.setExpirer(new Expirer(context.expireWindow));
 			}
@@ -62,6 +63,8 @@ public class FrequentItems {
 				freqFinder = new CountMinSketchesFrequent(context.errorLimit, context.errorProbLimit, 
 						context.mostFrequentCount);
 			}
+		} else {
+			throw new IllegalArgumentException("unsupported frequent item algorithm");
 		}
 		return freqFinder;
 	}
