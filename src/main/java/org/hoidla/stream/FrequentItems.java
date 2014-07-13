@@ -17,8 +17,11 @@
 
 package org.hoidla.stream;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import org.hoidla.util.Expirer;
+import org.hoidla.util.BoundedSortedObjects.SortableObject;
 
 /**
  * Probabilistic frequent count algorithms
@@ -75,27 +78,30 @@ public class FrequentItems {
 	 *
 	 * @param <T>
 	 */
-	public static interface FrequentItemsFinder {
+	public static abstract class  FrequentItemsFinder {
+		protected long count;
+		protected Expirer expirer;
+		protected List<Object> toBeRemoved = new ArrayList<Object>(); 
 		
 		/**
 		 * @param expirer
 		 */
-		public void setExpirer(Expirer expirer);
+		public abstract void setExpirer(Expirer expirer);
 		
 		/**
 		 * @param value
 		 */
-		public void add(Object value);
+		public abstract void add(Object value);
 		
 		/**
 		 * @param value
 		 * @param timestamp
 		 */
-		public void add(Object value, long timestamp);
+		public abstract void add(Object value, long timestamp);
 		
 		/**
 		 * @return
 		 */
-		public Map<Integer, Object> get();
+		public abstract  List<SortableObject> get();
 	}
 }

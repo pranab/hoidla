@@ -25,6 +25,7 @@ import org.hoidla.util.SequencedObjectCounter;
 import org.hoidla.util.SimpleObjectCounter;
 
 /**
+ * Frequent count by Misra Gries algorithm
  * @author pranab
  *
  */

@@ -24,22 +24,21 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
+import org.hoidla.util.BoundedSortedObjects;
 import org.hoidla.util.Expirer;
 import org.hoidla.util.ObjectCounter;
 import org.hoidla.util.SequencedObjectCounter;
 import org.hoidla.util.SimpleObjectCounter;
+import org.hoidla.util.BoundedSortedObjects.SortableObject;
 
 /**
  * @author pranab
  *
  * @param <T>
  */
-public class MisraGriesFrequent  implements FrequentItems.FrequentItemsFinder {
+public class MisraGriesFrequent  extends FrequentItems.FrequentItemsFinder {
 	private Map<Object, ObjectCounter> buckets = new HashMap<Object, ObjectCounter>(); 
 	private int maxBucket;
-	private List<Object> toBeRemoved = new ArrayList<Object>(); 
-	private Expirer expirer;
-	private List<Object> toBeExpired = new ArrayList<Object>();
 	
 	/**
 	 * @param maxBucket
@@ -48,6 +47,11 @@ public class MisraGriesFrequent  implements FrequentItems.FrequentItemsFinder {
 		this.maxBucket = maxBucket;
 	}
 	
+	public MisraGriesFrequent(int maxBucket, Expirer expirer ) {
+		this.maxBucket = maxBucket;
+		this.expirer = expirer;
+	}
+
 	public void setExpirer(Expirer expirer) {
 		this.expirer = expirer;
 	}
@@ -80,16 +84,16 @@ public class MisraGriesFrequent  implements FrequentItems.FrequentItemsFinder {
 		//expire old 
 		ObjectCounter counter = null;
 		if (null != expirer) {
-			toBeExpired.clear();
+			toBeRemoved.clear();
 			for (Object key : buckets.keySet()) {
 				counter = buckets.get(key);
 				counter.expire(expirer, timestamp);
 				
 				if (counter.isZero()) {
-					toBeExpired.add(key);
+					toBeRemoved.add(key);
 				}
 			}				
-			for (Object item :  toBeExpired) {
+			for (Object item :  toBeRemoved) {
 				buckets.remove(item);
 			}
 		}
@@ -132,12 +136,12 @@ public class MisraGriesFrequent  implements FrequentItems.FrequentItemsFinder {
 	 * 
 	 * @return items ordered by count
 	 */
-	public Map<Integer, Object> get() {
-		TreeMap<Integer, Object> orderItems = new TreeMap<Integer, Object>();
+	public List<BoundedSortedObjects.SortableObject> get() {
+		BoundedSortedObjects sortedObjects  = new  BoundedSortedObjects(maxBucket);		
 		for (Object key : buckets.keySet()) {
-			orderItems.put(buckets.get(key).getCount(), key);
+			sortedObjects.add(key, buckets.get(key).getCount());
 		}				
-		return orderItems;
+		return sortedObjects.get();
 	}
 	
 }

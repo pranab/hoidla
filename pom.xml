@@ -71,12 +71,6 @@ xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/ma
         </dependency>
 
         <dependency>
-            <groupId>org.apache.hadoop</groupId>
-            <artifactId>hadoop-core</artifactId>
-            <version>${hadoop.version}</version>
-        </dependency>
-        
-        <dependency>
             <groupId>org.testng</groupId>
             <artifactId>testng</artifactId>
             <classifier>jdk15</classifier>
@@ -96,11 +90,11 @@ xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/ma
             <version>${jackson.version}</version>
         </dependency>
         
-         <dependency>
-            <groupId>mawazo</groupId>
-            <artifactId>chombo</artifactId>
-            <version>1.0</version>
-        </dependency>
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-lang3</artifactId>
+			<version>3.1</version>
+		</dependency>		 
  
     </dependencies>
 
