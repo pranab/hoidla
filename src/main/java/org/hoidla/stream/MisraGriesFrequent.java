@@ -18,18 +18,15 @@
 
 package org.hoidla.stream;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.TreeMap;
 
 import org.hoidla.util.BoundedSortedObjects;
 import org.hoidla.util.Expirer;
 import org.hoidla.util.ObjectCounter;
 import org.hoidla.util.SequencedObjectCounter;
 import org.hoidla.util.SimpleObjectCounter;
-import org.hoidla.util.BoundedSortedObjects.SortableObject;
 
 /**
  * @author pranab

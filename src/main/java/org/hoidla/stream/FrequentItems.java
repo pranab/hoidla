@@ -19,9 +19,9 @@ package org.hoidla.stream;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
+
+import org.hoidla.util.BoundedSortedObjects;
 import org.hoidla.util.Expirer;
-import org.hoidla.util.BoundedSortedObjects.SortableObject;
 
 /**
  * Probabilistic frequent count algorithms
@@ -102,6 +102,32 @@ public class FrequentItems {
 		/**
 		 * @return
 		 */
-		public abstract  List<SortableObject> get();
+		public abstract  List<BoundedSortedObjects.SortableObject> get();
 	}
+	
+	/**
+	 * interface for frequency distribution
+	 * @author pranab
+	 *
+	 */
+	public static interface FrequencyDistribution {
+		
+		/**
+		 * @param value
+		 */
+		public void add(Object value);
+		
+		/**
+		 * @param value
+		 * @param sequence
+		 */
+		public void add(Object value, long sequence);
+		
+		/**
+		 * @param value
+		 * @return
+		 */
+		public int getDistr(Object value);
+	}
+	
 }

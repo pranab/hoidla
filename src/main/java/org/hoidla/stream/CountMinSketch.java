@@ -25,11 +25,11 @@ import org.hoidla.util.SequencedObjectCounter;
 import org.hoidla.util.SimpleObjectCounter;
 
 /**
- * Frequent count by Misra Gries algorithm
+ * Frequent distribution by count min sketch algorithms
  * @author pranab
  *
  */
-public class CountMinSketch {
+public class CountMinSketch implements FrequentItems.FrequencyDistribution {
 	//sketch
 	protected int width;
 	protected int depth;
