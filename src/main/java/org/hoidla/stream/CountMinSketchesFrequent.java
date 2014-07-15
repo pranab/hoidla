@@ -65,6 +65,7 @@ public class CountMinSketchesFrequent  extends FrequentItems.FrequentItemsFinder
 	 */
 	@Override
 	public void add(Object value) {
+		++count;
 		minSketches.add(value);
 		trackCount(value);
 	}
@@ -74,6 +75,7 @@ public class CountMinSketchesFrequent  extends FrequentItems.FrequentItemsFinder
 	 */
 	@Override
 	public void add(Object value, long sequence) {
+		++count;
 		minSketches.add(value, sequence);
 		trackCount(value);
 	}
@@ -83,8 +85,11 @@ public class CountMinSketchesFrequent  extends FrequentItems.FrequentItemsFinder
 	 * @param value
 	 */
 	private void trackCount(Object item) {
-		int count = minSketches.getDistr(item);
-		sortedObjects.add(item, count);
+		int itemCount = minSketches.getDistr(item);
+		sortedObjects.add(item, itemCount);
+		if (count  % 5000 == 0) {
+			sortedObjects.truncate();
+		}
 	}
 
 	/* (non-Javadoc)
@@ -92,6 +97,7 @@ public class CountMinSketchesFrequent  extends FrequentItems.FrequentItemsFinder
 	 */
 	@Override
 	public List<BoundedSortedObjects.SortableObject> get() {
+		sortedObjects.truncate();
 		return sortedObjects.get();	
 	}
 }

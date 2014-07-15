@@ -30,6 +30,7 @@ import org.apache.commons.lang3.tuple.ImmutablePair;
 public class BoundedSortedObjects {
 	private List<SortableObject> items = new ArrayList<SortableObject>();
 	private int maxSize;
+	private boolean contTruncation;
 	
 	/**
 	 * @author pranab
@@ -64,7 +65,22 @@ public class BoundedSortedObjects {
 		this.maxSize = maxSize;
 	}
 	
+	/**
+	 * @param maxSize
+	 */
+	public BoundedSortedObjects(int maxSize, boolean contTruncation) {
+		this.maxSize = maxSize;
+		this.contTruncation = contTruncation;
+	}
 	
+	/**
+	 * @param contTruncation
+	 */
+	public void setContTruncation(boolean contTruncation) {
+		this.contTruncation = contTruncation;
+	}
+
+
 	/**
 	 * @param item
 	 * @param rank
@@ -85,12 +101,29 @@ public class BoundedSortedObjects {
 		//add
 		SortableObject newItem = new SortableObject(rank, item);
 		items.add(newItem);
-		Collections.sort(items);
-		if (items.size() > maxSize) {
-			items.remove(items.size() - 1);
+		
+		if (contTruncation)  {
+			Collections.sort(items);
+			if (items.size() > maxSize) {
+				items.remove(items.size() - 1);
+			}
 		}
 	}	
 
+	/**
+	 * 
+	 */
+	public void truncate () {
+		Collections.sort(items);
+		if (items.size() > maxSize) {
+			List<SortableObject> tempItems = new ArrayList<SortableObject>();
+			for (int i = 0; i < maxSize; ++i) {
+				tempItems.add(items.get(i));
+			}
+			items = tempItems;
+		}
+	}
+	
 	/**
 	 * @return
 	 */

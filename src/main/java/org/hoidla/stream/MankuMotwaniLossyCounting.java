@@ -105,10 +105,15 @@ public class MankuMotwaniLossyCounting extends FrequentItems.FrequentItemsFinder
 	public List<BoundedSortedObjects.SortableObject> get() {
 		BoundedSortedObjects sortedObjects  = new  BoundedSortedObjects(maxFrequentItems);		
 		ImmutablePair<ObjectCounter, Long> counterWithError = null;
+		int i = 0;
 		for (Object key : buckets.keySet()) {
 			counterWithError = buckets.get(key);
 			sortedObjects.add(key, counterWithError.getLeft().getCount());
+			if (++i  % 1000 == 0) {
+				sortedObjects.truncate();
+			}
 		}		
+		sortedObjects.truncate();
 		return sortedObjects.get();
 	}
 

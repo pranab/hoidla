@@ -137,7 +137,8 @@ public class MisraGriesFrequent  extends FrequentItems.FrequentItemsFinder {
 		BoundedSortedObjects sortedObjects  = new  BoundedSortedObjects(maxBucket);		
 		for (Object key : buckets.keySet()) {
 			sortedObjects.add(key, buckets.get(key).getCount());
-		}				
+		}		
+		sortedObjects.truncate();
 		return sortedObjects.get();
 	}
 	
