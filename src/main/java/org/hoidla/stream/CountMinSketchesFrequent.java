@@ -90,7 +90,7 @@ public class CountMinSketchesFrequent  extends FrequentItems.FrequentItemsFinder
 	 */
 	private void trackCount(Object item) {
 		int itemCount = minSketches.getDistr(item);
-		if ( (itemCount * freqCountLimitPercent) / 100 > count) {
+		if ( itemCount > (count * freqCountLimitPercent) / 100) {
 			sortedObjects.add(item, itemCount);
 		}
 	}
