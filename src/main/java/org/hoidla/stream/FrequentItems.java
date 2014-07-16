@@ -42,6 +42,7 @@ public class FrequentItems {
 		public double errorLimit;
 		public double errorProbLimit; 
 		public int mostFrequentCount;
+		public int freqCountLimitPercent;
 	}
 	
 	/**
@@ -61,10 +62,10 @@ public class FrequentItems {
 		} else if (context.strategy.equals("CountMinSketches")) {
 			if (context.expireWindow > 0) {
 				freqFinder = new CountMinSketchesFrequent(context.errorLimit, context.errorProbLimit, 
-						context.mostFrequentCount, new Expirer(context.expireWindow));
+						context.mostFrequentCount, context.freqCountLimitPercent, new Expirer(context.expireWindow));
 			} else {
 				freqFinder = new CountMinSketchesFrequent(context.errorLimit, context.errorProbLimit, 
-						context.mostFrequentCount);
+						context.mostFrequentCount, context.freqCountLimitPercent);
 			}
 		} else {
 			throw new IllegalArgumentException("unsupported frequent item algorithm");

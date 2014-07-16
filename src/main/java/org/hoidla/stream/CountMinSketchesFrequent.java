@@ -33,23 +33,27 @@ public class CountMinSketchesFrequent  extends FrequentItems.FrequentItemsFinder
 	protected TreeMap<Integer, Object> orderedItems = new TreeMap<Integer, Object>();
 	protected int mostFrequentCount;
 	private BoundedSortedObjects sortedObjects;		
-
+	private int freqCountLimitPercent;
+	
 	/**
 	 * @param errorLimit
 	 * @param errorProbLimit
 	 * @param mostFrequentCount
 	 */
-	public CountMinSketchesFrequent(double errorLimit, double errorProbLimit, int mostFrequentCount) {
+	public CountMinSketchesFrequent(double errorLimit, double errorProbLimit, int mostFrequentCount,
+			int freqCountLimitPercent) {
 		minSketches = new CountMinSketch(errorLimit,  errorProbLimit);
 		this.mostFrequentCount = mostFrequentCount;
 		sortedObjects  = new  BoundedSortedObjects(mostFrequentCount);
+		this.freqCountLimitPercent =  freqCountLimitPercent;
 	}
 	
 	public CountMinSketchesFrequent(double errorLimit, double errorProbLimit, int mostFrequentCount,
-			Expirer expirer) {
+			int freqCountLimitPercent, Expirer expirer) {
 		minSketches = new CountMinSketch(errorLimit,  errorProbLimit, expirer);
 		this.mostFrequentCount = mostFrequentCount;
 		sortedObjects  = new  BoundedSortedObjects(mostFrequentCount);
+		this.freqCountLimitPercent =  freqCountLimitPercent;
 	}
 
 	/*
@@ -86,9 +90,8 @@ public class CountMinSketchesFrequent  extends FrequentItems.FrequentItemsFinder
 	 */
 	private void trackCount(Object item) {
 		int itemCount = minSketches.getDistr(item);
-		sortedObjects.add(item, itemCount);
-		if (count  % 5000 == 0) {
-			sortedObjects.truncate();
+		if ( (itemCount * freqCountLimitPercent) / 100 > count) {
+			sortedObjects.add(item, itemCount);
 		}
 	}
 
