@@ -17,6 +17,8 @@
 
 package org.hoidla.util;
 
+import java.io.UnsupportedEncodingException;
+
 /**
  * Different hashing algorithms
  * @author pranab
@@ -114,20 +116,59 @@ public class Hashing {
 	 * @author pranab
 	 *
 	 */
-	public class MultiHashFamily {
+	public static class MultiHashFamily {
 		private int numHash;
 		private int hashValueMax;
 		private int[] a;
 		private int[] b;
 		private final  int prime = 1000099;
 
+		/**
+		 * @param numHash
+		 * @param hashValueMax
+		 */
 		public MultiHashFamily(int numHash, int hashValueMax) {
-			this.numHash = numHash;
+			this(numHash);
 			this.hashValueMax = hashValueMax;
+		}
+		
+		/**
+		 * @param numHash
+		 */
+		public MultiHashFamily(int numHash) {
+			this.numHash = numHash;
 			a = new int[numHash];
 			b = new int[numHash];
+			
+			for (int i = 0; i < numHash; ++i) {
+				a[i] = (int)(Math.random() * prime);
+				b[i] = (int)(Math.random() * prime);
+			}
 		}
 
+		/**
+		 * @param data
+		 * @param hashFun
+		 * @return
+		 */
+		public int hash(Object data, int hashFun) {
+			byte[] bytes = null;
+			if (data instanceof String) {
+				try {
+					bytes = ((String)data).getBytes("utf-8");
+				} catch (UnsupportedEncodingException e) {
+					throw new IllegalArgumentException("failed to decode string into byte array" + e.getMessage());
+				}
+			}
+			
+			return hash(bytes, hashFun);
+		}
+
+		/**
+		 * @param data
+		 * @param hashFun
+		 * @return
+		 */
 		public int hash(byte[] data, int hashFun) {
 			if (hashFun <0 || hashFun >= numHash) {
 				throw new IllegalArgumentException("invalid hash function index " + hashFun);
@@ -138,8 +179,18 @@ public class Hashing {
 				accum ^= data[i] * a[hashFun];
 			}
 			accum ^= b[hashFun];
-			hashCode =  (accum % prime) % hashValueMax;
+			accum &= 0xefffffff;
+			hashCode =  accum % prime;
+			if (hashValueMax > 0) {
+				hashCode= hashCode % hashValueMax;
+			}
 			return hashCode;
 		}
+		
+		public int bound(int hashCode) {
+			return hashCode % hashValueMax;
+		}
+		
 	}
+	
 }
