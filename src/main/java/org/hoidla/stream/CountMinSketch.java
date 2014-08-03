@@ -17,9 +17,8 @@
 
 package org.hoidla.stream;
 
-import java.io.UnsupportedEncodingException;
-
 import org.hoidla.util.Expirer;
+import org.hoidla.util.Hashing;
 import org.hoidla.util.ObjectCounter;
 import org.hoidla.util.SequencedObjectCounter;
 import org.hoidla.util.SimpleObjectCounter;
@@ -29,19 +28,7 @@ import org.hoidla.util.SimpleObjectCounter;
  * @author pranab
  *
  */
-public class CountMinSketch implements FrequentItems.FrequencyDistribution {
-	//sketch
-	protected int width;
-	protected int depth;
-	protected ObjectCounter[][] sketch;
-	protected Expirer expirer;
-	
-	//hash family
-	protected int[] a;
-	protected int[] b;
-	
-	//large prime
-	protected int c = 1000099;
+public class CountMinSketch extends  BaseCountSketch implements FrequentItems.FrequencyDistribution {
 
 	/** 
 	 * Constructor based on error bounds
@@ -49,16 +36,11 @@ public class CountMinSketch implements FrequentItems.FrequencyDistribution {
 	 * @param errorProbLimit
 	 */
 	public CountMinSketch(double errorLimit, double errorProbLimit) {
-		width = (int)Math.round(2.0 / errorLimit);
-		depth = (int)Math.round(Math.log(errorProbLimit));
-		initialize(width, depth);
+		super(errorLimit, errorProbLimit);
 	}	
 	
 	public CountMinSketch(double errorLimit, double errorProbLimit, Expirer expirer) {
-		this.expirer = expirer;
-		width = (int)Math.round(2.0 / errorLimit);
-		depth = (int)Math.round(Math.log(errorProbLimit));
-		initialize(width, depth);
+		super(errorLimit, errorProbLimit, expirer);
 	}	
 
 	/**
@@ -67,37 +49,16 @@ public class CountMinSketch implements FrequentItems.FrequencyDistribution {
 	 * @param depth
 	 */
 	public CountMinSketch(int width, int depth) {
-		initialize(width, depth);
+		super(width, depth);
 	}
 
-	/**
-	 * @param width
-	 * @param depth
-	 */
-	public void initialize(int width, int depth) {
-		this.width = width;
-		this.depth = depth;
-		sketch = new ObjectCounter[depth][width];
-		a = new int[depth];
-		b = new int[depth];
-
-		//initialize
-		for (int i = 0; i < depth; ++i) {
-			a[i] = (int)(Math.random() * c);
-			b[i] = (int)(Math.random() * c);
-			for (int j = 0; j < width; ++j) {
-				sketch[i][j] = expirer == null ? new SimpleObjectCounter() :  new SequencedObjectCounter();
-			}
-		}
-	}
-		
 	/**
 	 * Adds a value
 	 * @param value
 	 */
 	public void add(Object value) {
 		for (int d = 0; d < depth; ++d) {
-			int w = hash(value,  d);
+			int w = hashFamily.hash(value,  d);
 			ObjectCounter counter = sketch[d][w];
 			counter.increment();
 		}
@@ -119,7 +80,7 @@ public class CountMinSketch implements FrequentItems.FrequencyDistribution {
 
 		//increment
 		for (int d = 0; d < depth; ++d) {
-			int w = hash(value,  d);
+			int w = hashFamily.hash(value,  d);
 			counter = sketch[d][w];
 			counter.increment();
 		}
@@ -133,7 +94,7 @@ public class CountMinSketch implements FrequentItems.FrequencyDistribution {
 	public int getDistr(Object value) {
 		int count = Integer.MAX_VALUE;
 		for (int d = 0; d < depth; ++d) {
-			int w = hash(value,  d);
+			int w =  hashFamily.hash(value,  d);
 			int thisCount = sketch[d][w].getCount();
 			if (thisCount < count) {
 				count = thisCount;
@@ -141,41 +102,4 @@ public class CountMinSketch implements FrequentItems.FrequencyDistribution {
 		}			
 		return count;
 	}
-	
-	/**
-	 * hash for d th hash function
-	 * @param value
-	 * @param d  
-	 * @return
-	 */
-	protected  int hash(Object value, int d) {
-		int hashCode = 0;
-		if (value instanceof String) {
-			byte[] bytes = null;
-			try {
-				bytes = ((String)value).getBytes("utf-8");
-			} catch (UnsupportedEncodingException e) {
-				throw new IllegalArgumentException("failed to decode string into byte array" + e.getMessage());
-			}
-			int accum = 0;
-			for (int i =0; i < bytes.length; ++i) {
-				accum ^= bytes[i] * a[d];
-			}
-			accum ^= b[d];
-			hashCode =  (accum % c) % width;
-		} else if (value instanceof Integer) {
-			Integer valInt = (Integer)value;
-			int accum = 0;
-			for (int i =0; i < 4; ++i) {
-				accum ^= (valInt & 0x000F)  * a[d];
-				valInt >>= 8;
-			}
-			accum ^= b[d];
-			hashCode =  (accum % c) % width;
-		} else {
-			throw new IllegalArgumentException("unsupported item type for count min sketch");
-		}
-		return hashCode;
-	}
-
 }

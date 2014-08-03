@@ -152,16 +152,20 @@ public class Hashing {
 		 * @return
 		 */
 		public int hash(Object data, int hashFun) {
-			byte[] bytes = null;
+			int hashCode = 0;
 			if (data instanceof String) {
 				try {
-					bytes = ((String)data).getBytes("utf-8");
+					byte[] bytesData = ((String)data).getBytes("utf-8");
+					hashCode = hash(bytesData, hashFun);
 				} catch (UnsupportedEncodingException e) {
 					throw new IllegalArgumentException("failed to decode string into byte array" + e.getMessage());
 				}
+			} else if (data instanceof Integer) {
+				int intData = (Integer)data;
+				hashCode = hash(intData, hashFun);
 			}
 			
-			return hash(bytes, hashFun);
+			return hashCode;
 		}
 
 		/**
@@ -176,9 +180,9 @@ public class Hashing {
 			int hashCode;
 			int accum = 0;
 			for (int i =0; i < data.length; ++i) {
-				accum ^= data[i] * a[hashFun];
+				accum += data[i] * a[hashFun];
 			}
-			accum ^= b[hashFun];
+			accum += b[hashFun];
 			accum &= 0xefffffff;
 			hashCode =  accum % prime;
 			if (hashValueMax > 0) {
@@ -186,10 +190,24 @@ public class Hashing {
 			}
 			return hashCode;
 		}
-		
-		public int bound(int hashCode) {
-			return hashCode % hashValueMax;
+
+		/**
+		 * @param data
+		 * @param hashFun
+		 * @return
+		 */
+		public int hash(int data, int hashFun) {
+			if (hashFun <0 || hashFun >= numHash) {
+				throw new IllegalArgumentException("invalid hash function index " + hashFun);
+			}
+			int hashCode  = data *  a[hashFun] + b[hashFun];
+			hashCode =  hashCode % prime;
+			if (hashValueMax > 0) {
+				hashCode= hashCode % hashValueMax;
+			}
+			return hashCode;
 		}
+		
 		
 	}
 	
