@@ -201,6 +201,7 @@ public class Hashing {
 				throw new IllegalArgumentException("invalid hash function index " + hashFun);
 			}
 			int hashCode  = data *  a[hashFun] + b[hashFun];
+			hashCode &= 0xefffffff;
 			hashCode =  hashCode % prime;
 			if (hashValueMax > 0) {
 				hashCode= hashCode % hashValueMax;
@@ -208,6 +209,23 @@ public class Hashing {
 			return hashCode;
 		}
 		
+		/**
+		 * @param data
+		 * @param hashFun
+		 * @return
+		 */
+		public int hash(String data, int hashFun) {
+			if (hashFun <0 || hashFun >= numHash) {
+				throw new IllegalArgumentException("invalid hash function index " + hashFun);
+			}
+			int hashCode  = data.hashCode() *  a[hashFun] + b[hashFun];
+			hashCode &= 0xefffffff;
+			hashCode =  hashCode % prime;
+			if (hashValueMax > 0) {
+				hashCode= hashCode % hashValueMax;
+			}
+			return hashCode;
+		}
 		
 	}
 	

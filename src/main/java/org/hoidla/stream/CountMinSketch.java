@@ -18,10 +18,7 @@
 package org.hoidla.stream;
 
 import org.hoidla.util.Expirer;
-import org.hoidla.util.Hashing;
 import org.hoidla.util.ObjectCounter;
-import org.hoidla.util.SequencedObjectCounter;
-import org.hoidla.util.SimpleObjectCounter;
 
 /**
  * Frequent distribution by count min sketch algorithms
