@@ -28,13 +28,13 @@ public class SizeBoundWindow<T> extends DataWindow<T>{
 	private int maxSize;
 	
 	public SizeBoundWindow(int maxSize) {
-		super();
+		super(true);
 		this.maxSize = maxSize;
 	}
 	
 	public void expire() {
 		if (dataWindow.size() > maxSize) {
-			dataWindow.remove();
+			dataWindow.remove(0);
 		}
 	}
 	

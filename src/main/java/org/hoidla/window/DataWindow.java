@@ -17,6 +17,8 @@
 
 package org.hoidla.window;
 
+import java.util.AbstractList;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedList;
 
@@ -27,9 +29,10 @@ import java.util.LinkedList;
  * @param <T>
  */
 public abstract class DataWindow<T> {
-	protected LinkedList<T> dataWindow = new LinkedList<T>();
+	protected AbstractList<T> dataWindow = null;
 	
-	public DataWindow() {
+	public DataWindow(boolean withSequentialAccess) {
+		dataWindow = withSequentialAccess ? new LinkedList<T>() : new ArrayList<T>();
 	}
 	
 	public void add(T obj) {
@@ -43,4 +46,11 @@ public abstract class DataWindow<T> {
 		return dataWindow.iterator();
 	}
 
+	public int size() {
+		return dataWindow.size();
+	}
+	
+	public void set(int index, T obj) {
+		dataWindow.set(index, obj);
+	}
 }

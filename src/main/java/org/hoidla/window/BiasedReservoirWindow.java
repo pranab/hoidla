@@ -17,33 +17,34 @@
 
 package org.hoidla.window;
 
-import java.util.ListIterator;
-
-import org.hoidla.util.TimeStamped;
-
-/**
- * Time bound window
- * @author pranab
- *
- */
-public class TImeBoundWindow extends DataWindow<TimeStamped>{
-	private long timeSpan;
+public class BiasedReservoirWindow<T> extends DataWindow<T> {
+	private int maxSize;
 	
-	public TImeBoundWindow(long timeSpan) {
-		super(true);
-		this.timeSpan = timeSpan;
+	public BiasedReservoirWindow(int maxSize) {
+		super(false);
+		this.maxSize = maxSize;
+	}
+
+	@Override
+	public void add(T obj) {
+		int elementToReplace = -1;
+		int curSize = size();
+		if (size() == maxSize) {
+			elementToReplace = (int)(Math.random() * curSize);
+		} else {
+			if (Math.random() < curSize / (double)maxSize) {
+				elementToReplace = (int)(Math.random()  * curSize);
+			}
+		}
+		if (elementToReplace >= 0) {
+			set(elementToReplace, obj);
+		} else {
+			super.add(obj);
+		}
 	}
 	
 	@Override
 	public void expire() {
-		long earliest = System.currentTimeMillis() - timeSpan;
-		ListIterator<TimeStamped> iter =  dataWindow.listIterator();
-		while (iter.hasNext()) {
-			if (iter.next().getTimeStamp() < earliest) {
-				iter.remove();
-			}
-		}
-		
 	}
 
 }
