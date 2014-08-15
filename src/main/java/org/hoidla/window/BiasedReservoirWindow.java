@@ -17,9 +17,17 @@
 
 package org.hoidla.window;
 
+/**
+ * @author pranab
+ *
+ * @param <T>
+ */
 public class BiasedReservoirWindow<T> extends DataWindow<T> {
 	private int maxSize;
 	
+	/**
+	 * @param maxSize
+	 */
 	public BiasedReservoirWindow(int maxSize) {
 		super(false);
 		this.maxSize = maxSize;
@@ -29,11 +37,13 @@ public class BiasedReservoirWindow<T> extends DataWindow<T> {
 	public void add(T obj) {
 		int elementToReplace = -1;
 		int curSize = size();
-		if (size() == maxSize) {
+		if (curSize == maxSize) {
+			//always replace
 			elementToReplace = (int)(Math.random() * curSize);
 		} else {
-			if (Math.random() < curSize / (double)maxSize) {
-				elementToReplace = (int)(Math.random()  * curSize);
+			//may or may not replace
+			if (Math.random() < (curSize / (double)maxSize)) {
+				elementToReplace = (int)(Math.random() * curSize);
 			}
 		}
 		if (elementToReplace >= 0) {
