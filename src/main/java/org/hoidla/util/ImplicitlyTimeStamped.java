@@ -39,4 +39,8 @@ public class ImplicitlyTimeStamped implements TimeStamped {
 		return timeStamp;
 	}
 
+	public Object getValue() {
+		return value;
+	}
+
 }

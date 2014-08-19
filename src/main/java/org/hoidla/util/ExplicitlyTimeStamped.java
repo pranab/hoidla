@@ -33,4 +33,8 @@ public abstract class ExplicitlyTimeStamped implements TimeStamped {
 	@Override
 	public abstract long getTimeStamp();
 
+	public Object getValue() {
+		return value;
+	}
+
 }
