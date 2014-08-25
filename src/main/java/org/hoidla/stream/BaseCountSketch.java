@@ -29,15 +29,15 @@ public abstract class BaseCountSketch {
 	 * @param errorProbLimit
 	 */
 	public BaseCountSketch(double errorLimit, double errorProbLimit) {
-		width = (int)Math.round(2.0 / errorLimit);
-		depth = (int)Math.round(Math.log(errorProbLimit));
+		width = (int)Math.round(Math.E / errorLimit);
+		depth =(int)Math.round(Math.log(1.0 / errorProbLimit));
 		initialize(width, depth);
 	}	
 	
 	public BaseCountSketch(double errorLimit, double errorProbLimit, Expirer expirer) {
 		this.expirer = expirer;
 		width = (int)Math.round(2.0 / errorLimit);
-		depth = (int)Math.round(Math.log(errorProbLimit));
+		depth = (int)Math.round(Math.log(1.0 / (1.0 - errorProbLimit)));
 		initialize(width, depth);
 	}	
 

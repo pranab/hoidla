@@ -56,6 +56,9 @@ public class BoundedSortedObjects {
 			return that.getRank() - this.getRank();
 		}
 		
+		public String toString() {
+			return pair.getRight().toString() + ":" + pair.getLeft().toString();
+		}
 	}
 	
 	/**
