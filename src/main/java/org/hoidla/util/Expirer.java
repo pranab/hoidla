@@ -17,8 +17,10 @@
 
 package org.hoidla.util;
 
+import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
+
 
 /**
  * expires items from a list
@@ -27,9 +29,35 @@ import java.util.ListIterator;
  */
 public class Expirer {
 	private long window;
+	private int maxEpochs;
 	
+	protected enum ExpiryPolicy {
+		Sequence,
+		Epoch
+	}
+	private ExpiryPolicy expiryPolicy;
+	
+	//hash family
+	protected  Hashing.MultiHashFamily hashFamily;
+	
+	/**
+	 * 
+	 */
+	public Expirer(int maxEpochs) {
+		this.maxEpochs = maxEpochs;
+		expiryPolicy = ExpiryPolicy.Epoch;
+	}
+	
+	/**
+	 * @param window
+	 */
 	public Expirer(long window) {
 		this.window = window;
+		expiryPolicy = ExpiryPolicy.Sequence;
+	}
+	
+	public boolean isSequenceExpirer() {
+		return expiryPolicy == ExpiryPolicy.Sequence;
 	}
 	
 	/**
@@ -46,6 +74,22 @@ public class Expirer {
 				}
 			}
 		}
+	}
+	
+	/**
+	 * @param count
+	 * @param epochs
+	 * @param maxEpochs
+	 * @return
+	 */
+	public int expire(int count, LinkedList<Integer> epochs) {
+		int newEpoch = count - epochs.getLast();
+		epochs.add(newEpoch);
+		if (epochs.size() > maxEpochs) {
+			int oldestEpoch = epochs.remove();
+			count -= oldestEpoch;
+		}
+		return count;
 	}
 	
 }

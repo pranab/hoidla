@@ -134,4 +134,7 @@ public class BoundedSortedObjects {
 		return items;
 	}
 
+	public void clear() {
+		items.clear();
+	}
 }

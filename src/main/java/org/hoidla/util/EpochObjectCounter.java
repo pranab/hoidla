@@ -17,39 +17,21 @@
 
 package org.hoidla.util;
 
-public class SimpleObjectCounter  implements ObjectCounter {
-	protected int count;
-	
-	@Override
-	public void increment() {
-		++count;
+import java.util.LinkedList;
+
+/**
+ * @author pranab
+ *
+ */
+public class EpochObjectCounter extends SimpleObjectCounter{
+	private LinkedList<Integer> epochs = new LinkedList<Integer>();
+
+	public EpochObjectCounter() {
 	}
 
 	@Override
-	public void increment(long sequence) {
-		throw new UnsupportedOperationException("invalid call for simple object counter");	
+	public void expire(Expirer expirer, long sequenceMax) {
+		count = expirer.expire(count, epochs);
 	}
 
-	@Override
-	public void  decrement() {
-		--count;
-}
-
-	@Override
-	public void change(int amount) {
-		count += amount;
-	}
-
-	public int getCount() {
-		return count;
-	}
-
-	public boolean isZero() {
-		return count == 0;
-	}
-
-	public void expire(Expirer expirer, long sequenceMin) {
-		throw new UnsupportedOperationException("invalid call for simple object counter");	
-	}
-	
 }

@@ -1,5 +1,6 @@
 package org.hoidla.stream;
 
+import org.hoidla.util.EpochObjectCounter;
 import org.hoidla.util.Expirer;
 import org.hoidla.util.Hashing;
 import org.hoidla.util.ObjectCounter;
@@ -18,7 +19,7 @@ public abstract class BaseCountSketch {
 	protected Expirer expirer;
 	
 	//hash family
-	protected  Hashing.MultiHashFamily hashFamily;
+	protected Hashing.MultiHashFamily hashFamily;
 	
 	//large prime
 	protected int c = 1000099;
@@ -63,7 +64,8 @@ public abstract class BaseCountSketch {
 		//initialize
 		for (int i = 0; i < depth; ++i) {
 			for (int j = 0; j < width; ++j) {
-				sketch[i][j] = expirer == null ? new SimpleObjectCounter() :  new SequencedObjectCounter();
+				sketch[i][j] = expirer == null ? new SimpleObjectCounter() : 
+					(expirer.isSequenceExpirer() ?  new SequencedObjectCounter() : new EpochObjectCounter());
 			}
 		}
 	}
