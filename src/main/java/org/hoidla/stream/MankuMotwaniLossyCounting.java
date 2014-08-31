@@ -131,4 +131,9 @@ public class MankuMotwaniLossyCounting extends FrequentItems.FrequentItemsFinder
 			buckets.remove(item);
 		}
 	}
+
+	@Override
+	public void expire() {
+		// TODO Auto-generated method stub
+	}
 }

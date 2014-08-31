@@ -141,5 +141,10 @@ public class MisraGriesFrequent  extends FrequentItems.FrequentItemsFinder {
 		sortedObjects.truncate();
 		return sortedObjects.get();
 	}
+
+	@Override
+	public void expire() {
+		// TODO Auto-generated method stub
+	}
 	
 }

@@ -104,6 +104,11 @@ public class FrequentItems {
 		 * @return
 		 */
 		public abstract  List<BoundedSortedObjects.SortableObject> get();
+		
+		/**
+		 * 
+		 */
+		public abstract  void expire();
 	}
 	
 	/**

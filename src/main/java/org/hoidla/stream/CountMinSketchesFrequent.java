@@ -17,7 +17,9 @@
 
 package org.hoidla.stream;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.TreeMap;
 
 import org.hoidla.util.BoundedSortedObjects;
@@ -94,6 +96,23 @@ public class CountMinSketchesFrequent  extends FrequentItems.FrequentItemsFinder
 			sortedObjects.add(item, itemCount);
 		}
 	}
+	
+	/**
+	 * 
+	 */
+	public void refreshCount() {
+		Map<Object, Integer> freqCounts = new HashMap<Object, Integer>();
+		List<BoundedSortedObjects.SortableObject> topHitters = sortedObjects.get();
+		for (BoundedSortedObjects.SortableObject topHitter : topHitters) {
+			int count = minSketches.getDistr(topHitter.getItem());
+			freqCounts.put(topHitter.getItem(), count);
+		}
+		
+		sortedObjects.clear();
+		for (Object item :  freqCounts.keySet()) {
+			sortedObjects.add(item, freqCounts.get(item));
+		}
+	}
 
 	/* (non-Javadoc)
 	 * @see org.hoidla.stream.FrequentItems.FrequentItemsFinder#get()
@@ -102,5 +121,9 @@ public class CountMinSketchesFrequent  extends FrequentItems.FrequentItemsFinder
 	public List<BoundedSortedObjects.SortableObject> get() {
 		sortedObjects.truncate();
 		return sortedObjects.get();	
+	}
+	
+	public void expire() {
+		minSketches.expire();
 	}
 }
