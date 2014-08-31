@@ -61,4 +61,8 @@ public class SequencedObjectCounter implements ObjectCounter {
 	public void expire(Expirer expirer, long sequenceMax) {
 		expirer.expire(sequences, sequenceMax);
 	}
+	
+	public void initialize() {
+		sequences.clear();
+	}
 }

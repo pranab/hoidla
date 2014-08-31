@@ -52,4 +52,7 @@ public class SimpleObjectCounter  implements ObjectCounter {
 		throw new UnsupportedOperationException("invalid call for simple object counter");	
 	}
 	
+	public void initialize() {
+		count = 0;
+	}
 }

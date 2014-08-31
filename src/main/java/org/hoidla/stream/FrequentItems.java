@@ -129,6 +129,17 @@ public class FrequentItems {
 		 * @return
 		 */
 		public int getDistr(Object value);
+		
+		/**
+		 * 
+		 */
+		public void expire();
+		
+		/**
+		 * 
+		 */
+		public void initialize();
+		
 	}
 	
 }

@@ -69,5 +69,25 @@ public abstract class BaseCountSketch {
 			}
 		}
 	}
+	
+	/**
+	 * 
+	 */
+	public void expire() {
+		long current = expirer.isSequenceExpirer() ? System.currentTimeMillis() : 0;
+		for (int i = 0; i < depth; ++i) {
+			for (int j = 0; j < width; ++j) {
+				sketch[i][j].expire(expirer, current);
+			}
+		}
+	}
+	
+	public void initialize() {
+		for (int i = 0; i < depth; ++i) {
+			for (int j = 0; j < width; ++j) {
+				sketch[i][j].initialize();
+			}
+		}
+	}
 
 }

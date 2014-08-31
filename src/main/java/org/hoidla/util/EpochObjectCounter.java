@@ -33,5 +33,10 @@ public class EpochObjectCounter extends SimpleObjectCounter{
 	public void expire(Expirer expirer, long sequenceMax) {
 		count = expirer.expire(count, epochs);
 	}
+	
+	public void initialize() {
+		count = 0;
+		epochs.clear();
+	}
 
 }

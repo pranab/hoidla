@@ -58,4 +58,9 @@ public interface ObjectCounter {
 	 */
 	public void expire(Expirer expirer, long sequenceMax);
 	
+	/**
+	 * 
+	 */
+	public void initialize();
+	
 }
