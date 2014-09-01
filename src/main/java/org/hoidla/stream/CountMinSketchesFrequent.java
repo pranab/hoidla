@@ -126,4 +126,8 @@ public class CountMinSketchesFrequent  extends FrequentItems.FrequentItemsFinder
 	public void expire() {
 		minSketches.expire();
 	}
+	
+	public void intialize() {
+		minSketches.initialize();
+	}
 }
