@@ -83,11 +83,22 @@ public class Expirer {
 	 * @return
 	 */
 	public int expire(int count, LinkedList<Integer> epochs) {
-		int newEpoch = count - epochs.getLast();
-		epochs.add(newEpoch);
-		if (epochs.size() > maxEpochs) {
-			int oldestEpoch = epochs.remove();
-			count -= oldestEpoch;
+		if (count > 0) {
+			if (epochs.size() > 0) {
+				int epochCounts = 0;
+				for (int epoch : epochs) {
+					epochCounts += epoch;
+				}
+				int newEpoch = count - epochCounts;
+				epochs.add(newEpoch);
+				if (epochs.size() > maxEpochs) {
+					int oldestEpoch = epochs.remove();
+					count -= oldestEpoch;
+				}
+			} else {
+				int newEpoch = count ;
+				epochs.add(newEpoch);
+			}
 		}
 		return count;
 	}

@@ -145,6 +145,11 @@ public class FrequentItems {
 		 */
 		public void initialize();
 		
+		/**
+		 * @return
+		 */
+		public int getCount();
+		
 	}
 	
 }

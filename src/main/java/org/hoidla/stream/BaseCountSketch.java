@@ -90,4 +90,15 @@ public abstract class BaseCountSketch {
 		}
 	}
 
+	public int getCount() {
+		int count = 0;
+		for (int d = 0; d < depth; ++d) {
+			for (int w = 0; w < width; ++w) {
+				int thisCount = sketch[d][w].getCount();
+				count += thisCount;
+			}
+		}			
+		return count;
+	}
+	
 }
