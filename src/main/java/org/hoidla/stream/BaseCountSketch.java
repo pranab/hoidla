@@ -1,5 +1,8 @@
 package org.hoidla.stream;
 
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
+
 import org.hoidla.util.EpochObjectCounter;
 import org.hoidla.util.Expirer;
 import org.hoidla.util.Hashing;
@@ -24,21 +27,25 @@ public abstract class BaseCountSketch {
 	//large prime
 	protected int c = 1000099;
 	
+	private static final Logger LOG = Logger.getLogger(BaseCountSketch.class);
+	
 	/** 
 	 * Constructor based on error bounds
 	 * @param errorLimit
 	 * @param errorProbLimit
 	 */
 	public BaseCountSketch(double errorLimit, double errorProbLimit) {
+		LOG.info("errorLimit:" + errorLimit + " errorProbLimit:" + errorProbLimit );
 		width = (int)Math.round(Math.E / errorLimit);
 		depth =(int)Math.round(Math.log(1.0 / errorProbLimit));
 		initialize(width, depth);
 	}	
 	
 	public BaseCountSketch(double errorLimit, double errorProbLimit, Expirer expirer) {
+		LOG.info("errorLimit:" + errorLimit + " errorProbLimit:" + errorProbLimit );
 		this.expirer = expirer;
-		width = (int)Math.round(2.0 / errorLimit);
-		depth = (int)Math.round(Math.log(1.0 / (1.0 - errorProbLimit)));
+		width = (int)Math.round(Math.E / errorLimit);
+		depth = (int)Math.round(Math.log(1.0 / errorProbLimit));
 		initialize(width, depth);
 	}	
 
@@ -51,11 +58,16 @@ public abstract class BaseCountSketch {
 		initialize(width, depth);
 	}
 
+	public static void enableLogging(Level level) {
+		LOG.setLevel(level);
+	}
+
 	/**
 	 * @param width
 	 * @param depth
 	 */
 	public void initialize(int width, int depth) {
+		LOG.info("width: " + width + " depth:" + depth);
 		this.width = width;
 		this.depth = depth;
 		sketch = new ObjectCounter[depth][width];

@@ -17,6 +17,9 @@
 
 package org.hoidla.stream;
 
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
+
 import org.hoidla.util.Expirer;
 import org.hoidla.util.ObjectCounter;
 
@@ -26,7 +29,8 @@ import org.hoidla.util.ObjectCounter;
  *
  */
 public class CountMinSketch extends  BaseCountSketch implements FrequentItems.FrequencyDistribution {
-
+	private static final Logger LOG = Logger.getLogger(CountMinSketch.class);
+	
 	/** 
 	 * Constructor based on error bounds
 	 * @param errorLimit
@@ -34,6 +38,7 @@ public class CountMinSketch extends  BaseCountSketch implements FrequentItems.Fr
 	 */
 	public CountMinSketch(double errorLimit, double errorProbLimit) {
 		super(errorLimit, errorProbLimit);
+		LOG.info("errorLimit:" + errorLimit + " errorProbLimit:" + errorProbLimit );
 	}	
 	
 	public CountMinSketch(double errorLimit, double errorProbLimit, Expirer expirer) {
@@ -49,15 +54,21 @@ public class CountMinSketch extends  BaseCountSketch implements FrequentItems.Fr
 		super(width, depth);
 	}
 
+	public static void enableLogging(Level level) {
+		LOG.setLevel(level);
+	}
+
 	/**
 	 * Adds a value
 	 * @param value
 	 */
 	public void add(Object value) {
+		LOG.info("item:" + value.toString());
 		for (int d = 0; d < depth; ++d) {
 			int w = hashFamily.hash(value,  d);
 			ObjectCounter counter = sketch[d][w];
 			counter.increment();
+			LOG.info("item:" + value.toString() + " current count:" + counter.getCount() );
 		}
 	}
 
@@ -97,6 +108,7 @@ public class CountMinSketch extends  BaseCountSketch implements FrequentItems.Fr
 				count = thisCount;
 			}
 		}			
+		LOG.info("item:" + value.toString() + " final count:" + count );
 		return count;
 	}
 	

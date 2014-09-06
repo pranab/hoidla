@@ -21,9 +21,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
 
 import org.hoidla.util.BoundedSortedObjects;
 import org.hoidla.util.Expirer;
+
 
 /**
  * Frequent count by Count Min Sketch algorithm
@@ -36,7 +39,8 @@ public class CountMinSketchesFrequent  extends FrequentItems.FrequentItemsFinder
 	protected int mostFrequentCount;
 	private BoundedSortedObjects sortedObjects;		
 	private int freqCountLimitPercent;
-	
+	private static final Logger LOG = Logger.getLogger(CountMinSketchesFrequent.class);
+
 	/**
 	 * @param errorLimit
 	 * @param errorProbLimit
@@ -58,6 +62,10 @@ public class CountMinSketchesFrequent  extends FrequentItems.FrequentItemsFinder
 		this.freqCountLimitPercent =  freqCountLimitPercent;
 	}
 
+	public static void enableLogging(Level level) {
+		LOG.setLevel(level);
+	}
+	
 	/*
 	/**
 	 * @param expirer
