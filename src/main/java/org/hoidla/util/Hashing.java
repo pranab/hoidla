@@ -183,7 +183,7 @@ public class Hashing {
 				accum += data[i] * a[hashFun];
 			}
 			accum += b[hashFun];
-			accum &= 0xefffffff;
+			accum &= 0x7fffffff;
 			hashCode =  accum % prime;
 			if (hashValueMax > 0) {
 				hashCode= hashCode % hashValueMax;

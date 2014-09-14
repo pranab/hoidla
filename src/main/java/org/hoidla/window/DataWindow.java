@@ -53,4 +53,8 @@ public abstract class DataWindow<T> {
 	public void set(int index, T obj) {
 		dataWindow.set(index, obj);
 	}
+	
+	public T get(int index) {
+		return dataWindow.get(index);
+	}
 }
