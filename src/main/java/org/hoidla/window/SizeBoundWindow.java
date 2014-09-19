@@ -26,17 +26,34 @@ import java.util.LinkedList;
  */
 public class SizeBoundWindow<T> extends DataWindow<T>{
 	private int maxSize;
+	private int stepSize = 1;
 	
 	public SizeBoundWindow(int maxSize) {
 		super(true);
 		this.maxSize = maxSize;
 	}
 	
+	public SizeBoundWindow(int maxSize, int stepSize) {
+		this(maxSize);
+		this.stepSize = stepSize;
+	}
+	
 	public void expire() {
 		if (dataWindow.size() > maxSize) {
-			dataWindow.remove(0);
+			if (stepSize > 1) {
+				processFullWindow();
+			}
+			if (stepSize == maxSize) {
+				dataWindow.clear();
+			} else {
+				for (int i = 0; i < stepSize; ++i) {
+					dataWindow.remove(0);
+				}
+			}
 		}
 	}
 	
-	
+	public boolean isFull() {
+		return dataWindow.size() == maxSize;
+	}
 }

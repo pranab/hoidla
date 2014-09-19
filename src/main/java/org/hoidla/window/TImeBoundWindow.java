@@ -28,22 +28,43 @@ import org.hoidla.util.TimeStamped;
  */
 public class TImeBoundWindow extends DataWindow<TimeStamped>{
 	private long timeSpan;
+	private long timeStep = 0;
 	
 	public TImeBoundWindow(long timeSpan) {
 		super(true);
 		this.timeSpan = timeSpan;
 	}
 	
+	public TImeBoundWindow(long timeSpan, long timeStep) {
+		this(timeSpan);
+		this.timeStep = timeStep;
+	}
+
 	@Override
 	public void expire() {
-		long earliest = System.currentTimeMillis() - timeSpan;
-		ListIterator<TimeStamped> iter =  dataWindow.listIterator();
-		while (iter.hasNext()) {
-			if (iter.next().getTimeStamp() < earliest) {
-				iter.remove();
+		if (timeStep > 0) {
+			TimeStamped earliest = getEarliest();
+			TimeStamped latest = getLatest();
+			if ((latest.getTimeStamp() - earliest.getTimeStamp()) > timeSpan) {
+				long earliestRetained = latest.getTimeStamp() - timeSpan + timeStep;
+				ListIterator<TimeStamped> iter =  dataWindow.listIterator();
+				while (iter.hasNext()) {
+					if (iter.next().getTimeStamp() < earliestRetained) {
+						iter.remove();
+					}
+				}
+			}
+			
+		} else {
+			TimeStamped latest = getLatest();
+			long earliestRetained = latest.getTimeStamp() - timeSpan;
+			ListIterator<TimeStamped> iter =  dataWindow.listIterator();
+			while (iter.hasNext()) {
+				if (iter.next().getTimeStamp() < earliestRetained) {
+					iter.remove();
+				}
 			}
 		}
-		
 	}
 
 }

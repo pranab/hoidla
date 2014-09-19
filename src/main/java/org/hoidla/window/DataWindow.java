@@ -57,4 +57,16 @@ public abstract class DataWindow<T> {
 	public T get(int index) {
 		return dataWindow.get(index);
 	}
+	
+	public T getEarliest() {
+		return dataWindow.get(0);
+	}
+	
+	public T getLatest() {
+		return dataWindow.get(dataWindow.size() - 1);
+	}
+	
+	public void processFullWindow() {
+		
+	}
 }

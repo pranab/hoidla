@@ -3,7 +3,7 @@ Set of reusable big data real time streaming algorithms. Can be used by  Spark S
 or any other stream computation framework
 
 ## Philosophy
-* Plain java API that can ve used from any stream computation framework
+* Plain java API that can be used from any stream computation framework
 
 ## Blogs
 The following blogs of mine are good source of details. These are the only source
