@@ -66,7 +66,10 @@ public abstract class DataWindow<T> {
 		return dataWindow.get(dataWindow.size() - 1);
 	}
 	
-	public void processFullWindow() {
-		
+	public  void processFullWindow() {
+	}
+	
+	public void clear() {
+		dataWindow.clear();
 	}
 }

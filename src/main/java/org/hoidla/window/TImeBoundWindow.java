@@ -46,6 +46,7 @@ public class TImeBoundWindow extends DataWindow<TimeStamped>{
 			TimeStamped earliest = getEarliest();
 			TimeStamped latest = getLatest();
 			if ((latest.getTimeStamp() - earliest.getTimeStamp()) > timeSpan) {
+				processFullWindow();
 				long earliestRetained = latest.getTimeStamp() - timeSpan + timeStep;
 				ListIterator<TimeStamped> iter =  dataWindow.listIterator();
 				while (iter.hasNext()) {
