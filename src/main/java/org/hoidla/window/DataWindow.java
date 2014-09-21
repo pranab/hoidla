@@ -72,4 +72,6 @@ public abstract class DataWindow<T> {
 	public void clear() {
 		dataWindow.clear();
 	}
+	
+	public abstract boolean isFull();
 }

@@ -57,4 +57,8 @@ public class BiasedReservoirWindow<T> extends DataWindow<T> {
 	public void expire() {
 	}
 
+	public boolean isFull() {
+		return dataWindow.size() == maxSize;
+	}
+
 }

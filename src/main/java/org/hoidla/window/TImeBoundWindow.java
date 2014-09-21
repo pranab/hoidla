@@ -68,4 +68,9 @@ public class TImeBoundWindow extends DataWindow<TimeStamped>{
 		}
 	}
 
+	public boolean isFull() {
+		TimeStamped earliest = getEarliest();
+		TimeStamped latest = getLatest();
+		return (latest.getTimeStamp() - earliest.getTimeStamp()) > (0.95 * timeSpan);
+	}
 }
