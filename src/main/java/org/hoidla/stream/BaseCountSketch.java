@@ -71,7 +71,7 @@ public abstract class BaseCountSketch {
 		this.width = width;
 		this.depth = depth;
 		sketch = new ObjectCounter[depth][width];
-		hashFamily = new Hashing.MultiHashFamily(width, depth);
+		hashFamily = new Hashing.MultiHashFamily(depth, width);
 
 		//initialize
 		for (int i = 0; i < depth; ++i) {
