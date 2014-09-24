@@ -63,12 +63,12 @@ public class CountMinSketch extends  BaseCountSketch implements FrequentItems.Fr
 	 * @param value
 	 */
 	public void add(Object value) {
-		LOG.info("item:" + value.toString());
+		LOG.debug("item:" + value.toString());
 		for (int d = 0; d < depth; ++d) {
 			int w = hashFamily.hash(value,  d);
 			ObjectCounter counter = sketch[d][w];
 			counter.increment();
-			LOG.info("item:" + value.toString() + " current count:" + counter.getCount() );
+			LOG.debug("item:" + value.toString() + " current count:" + counter.getCount() );
 		}
 	}
 
@@ -108,7 +108,7 @@ public class CountMinSketch extends  BaseCountSketch implements FrequentItems.Fr
 				count = thisCount;
 			}
 		}			
-		LOG.info("item:" + value.toString() + " final count:" + count );
+		LOG.debug("item:" + value.toString() + " final count:" + count );
 		return count;
 	}
 	
