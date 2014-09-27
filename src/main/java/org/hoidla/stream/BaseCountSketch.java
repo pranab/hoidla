@@ -17,8 +17,8 @@
 
 package org.hoidla.stream;
 
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import org.hoidla.util.EpochObjectCounter;
 import org.hoidla.util.Expirer;
@@ -44,7 +44,7 @@ public abstract class BaseCountSketch {
 	//large prime
 	protected int c = 1000099;
 	
-	private static final Logger LOG = Logger.getLogger(BaseCountSketch.class);
+	private static final Logger LOG = LoggerFactory.getLogger(BaseCountSketch.class);
 	
 	/** 
 	 * Constructor based on error bounds
@@ -75,9 +75,6 @@ public abstract class BaseCountSketch {
 		initialize(width, depth);
 	}
 
-	public static void enableLogging(Level level) {
-		LOG.setLevel(level);
-	}
 
 	/**
 	 * @param width

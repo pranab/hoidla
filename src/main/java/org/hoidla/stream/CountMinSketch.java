@@ -17,8 +17,15 @@
 
 package org.hoidla.stream;
 
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import org.hoidla.util.EpochObjectCounter;
+import org.hoidla.util.Expirer;
+import org.hoidla.util.Hashing;
+import org.hoidla.util.ObjectCounter;
+import org.hoidla.util.SequencedObjectCounter;
+import org.hoidla.util.SimpleObjectCounter;
 
 import org.hoidla.util.Expirer;
 import org.hoidla.util.ObjectCounter;
@@ -29,7 +36,7 @@ import org.hoidla.util.ObjectCounter;
  *
  */
 public class CountMinSketch extends  BaseCountSketch implements FrequentItems.FrequencyDistribution {
-	private static final Logger LOG = Logger.getLogger(CountMinSketch.class);
+	private static final Logger LOG = LoggerFactory.getLogger(CountMinSketch.class);
 	
 	/** 
 	 * Constructor based on error bounds
@@ -54,9 +61,6 @@ public class CountMinSketch extends  BaseCountSketch implements FrequentItems.Fr
 		super(width, depth);
 	}
 
-	public static void enableLogging(Level level) {
-		LOG.setLevel(level);
-	}
 
 	/**
 	 * Adds a value
