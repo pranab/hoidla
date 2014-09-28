@@ -17,16 +17,17 @@
 
 package org.hoidla.util;
 
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+/**
+ * @author pranab
+ *
+ */
 public class SimpleObjectCounter  implements ObjectCounter {
 	protected int count;
-	private static final Logger LOG = Logger.getLogger(SimpleObjectCounter.class);
+	private static final Logger LOG = LoggerFactory.getLogger(SimpleObjectCounter.class);
 	
-	public static void enableLogging(Level level) {
-		LOG.setLevel(level);
-	}
 	
 	@Override
 	public void increment() {
