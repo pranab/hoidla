@@ -24,6 +24,7 @@ import java.util.TreeMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import org.hoidla.util.BoundedSortedObjects.SortableObject;
 import org.hoidla.util.EpochObjectCounter;
 import org.hoidla.util.Expirer;
 import org.hoidla.util.Hashing;
@@ -103,7 +104,10 @@ public class CountMinSketchesFrequent  extends FrequentItems.FrequentItemsFinder
 	 */
 	private void trackCount(Object item) {
 		int itemCount = minSketches.getDistr(item);
-		int totalCount = minSketches.getCount();
+		int totalCount = 0;
+		for(SortableObject obj : sortedObjects.get()){
+			totalCount += minSketches.getDistr(obj.getItem());
+		}
 		if ( itemCount > (totalCount * freqCountLimitPercent) / 100) {
 			sortedObjects.add(item, itemCount);
 		}
