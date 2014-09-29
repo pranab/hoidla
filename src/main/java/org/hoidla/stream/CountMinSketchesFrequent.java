@@ -47,6 +47,7 @@ public class CountMinSketchesFrequent  extends FrequentItems.FrequentItemsFinder
 	protected int mostFrequentCount;
 	private BoundedSortedObjects sortedObjects;		
 	private int freqCountLimitPercent;
+	private boolean globalTotalCount = false;
 	private static final Logger LOG = LoggerFactory.getLogger(CountMinSketchesFrequent.class);
 
 	/**
@@ -62,12 +63,28 @@ public class CountMinSketchesFrequent  extends FrequentItems.FrequentItemsFinder
 		this.freqCountLimitPercent =  freqCountLimitPercent;
 	}
 	
+	/**
+	 * @param errorLimit
+	 * @param errorProbLimit
+	 * @param mostFrequentCount
+	 * @param freqCountLimitPercent
+	 * @param expirer
+	 */
 	public CountMinSketchesFrequent(double errorLimit, double errorProbLimit, int mostFrequentCount,
 			int freqCountLimitPercent, Expirer expirer) {
 		minSketches = new CountMinSketch(errorLimit,  errorProbLimit, expirer);
 		this.mostFrequentCount = mostFrequentCount;
 		sortedObjects  = new  BoundedSortedObjects(mostFrequentCount);
 		this.freqCountLimitPercent =  freqCountLimitPercent;
+	}
+	
+	/**
+	 * @param globalTotalCount true when item domain is narrow and false otherwise
+	 * @return
+	 */
+	public CountMinSketchesFrequent withGlobalTotalCount(boolean globalTotalCount) {
+		this.globalTotalCount = globalTotalCount;
+		return this;
 	}
 
 	/*
@@ -105,8 +122,14 @@ public class CountMinSketchesFrequent  extends FrequentItems.FrequentItemsFinder
 	private void trackCount(Object item) {
 		int itemCount = minSketches.getDistr(item);
 		int totalCount = 0;
-		for(SortableObject obj : sortedObjects.get()){
-			totalCount += minSketches.getDistr(obj.getItem());
+		if (globalTotalCount) {
+			//for narrow domain
+			totalCount = minSketches.getCount();
+		} else {
+			//when domain is very large
+			for(SortableObject obj : sortedObjects.get()){
+				totalCount += minSketches.getDistr(obj.getItem());
+			}
 		}
 		if ( itemCount > (totalCount * freqCountLimitPercent) / 100) {
 			sortedObjects.add(item, itemCount);
