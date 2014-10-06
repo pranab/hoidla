@@ -42,7 +42,7 @@ public class BiasedReservoirWindow<T> extends DataWindow<T> {
 			elementToReplace = (int)(Math.random() * curSize);
 		} else {
 			//may or may not replace
-			if (Math.random() < (curSize / (double)maxSize)) {
+			if (curSize > 0 && Math.random() < (curSize / (double)maxSize)) {
 				elementToReplace = (int)(Math.random() * curSize);
 			}
 		}
