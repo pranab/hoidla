@@ -37,14 +37,27 @@ public class HyperLogLog implements UniqueItemsCounter {
 	 * @param numBucketBits
 	 */
 	public HyperLogLog(int numBucketBits) {
-		super();
+		//validity check
 		this.numBucketBits = numBucketBits;
-		bucketCount = 1 << numBucketBits - 1;
+		final int minBits = 4;
+		final int maxBits = Integer.SIZE * 3 / 4;
+		this.numBucketBits = this.numBucketBits < minBits ? minBits : 
+			(this.numBucketBits > maxBits ? maxBits : this.numBucketBits);
+		
+		//set up buckets
+		bucketCount = 1 << this.numBucketBits;
 		buckets = new int[bucketCount];
 		intializeBuckets();
 		calculateBiasCorrection();
 	}
 
+	/**
+	 * @param relStdDev
+	 */
+	public HyperLogLog(double relStdDev) {
+		this((int)(Math.log((1.106 / relStdDev) * (1.106 / relStdDev)) / Math.log(2)));
+	}	
+	
 	/**
 	 * 
 	 */
