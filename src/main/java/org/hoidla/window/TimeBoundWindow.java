@@ -26,16 +26,16 @@ import org.hoidla.util.TimeStamped;
  * @author pranab
  *
  */
-public class TImeBoundWindow extends DataWindow<TimeStamped>{
+public class TimeBoundWindow extends DataWindow<TimeStamped>{
 	private long timeSpan;
 	private long timeStep = 0;
 	
-	public TImeBoundWindow(long timeSpan) {
+	public TimeBoundWindow(long timeSpan) {
 		super(true);
 		this.timeSpan = timeSpan;
 	}
 	
-	public TImeBoundWindow(long timeSpan, long timeStep) {
+	public TimeBoundWindow(long timeSpan, long timeStep) {
 		this(timeSpan);
 		this.timeStep = timeStep;
 	}

@@ -32,6 +32,7 @@ public class HyperLogLog implements UniqueItemsCounter {
 	private Hashing.MultiHashFamily hashFamily;
 	private int[] buckets;
 	private double biasCorrection;
+	private long count;
 	
 	/**
 	 * @param numBucketBits
@@ -49,6 +50,7 @@ public class HyperLogLog implements UniqueItemsCounter {
 		buckets = new int[bucketCount];
 		intializeBuckets();
 		calculateBiasCorrection();
+		count = 0;
 	}
 
 	/**
@@ -108,11 +110,18 @@ public class HyperLogLog implements UniqueItemsCounter {
 		if (leadZeros > buckets[bucketIndex]) {
 			buckets[bucketIndex] = leadZeros;
 		}
+		
+		++count;
+	}
+
+	public long getCount() {
+		return count;
 	}
 
 	@Override
 	public void clear() {
 		intializeBuckets();
+		count = 0;
 	}
 
 }
