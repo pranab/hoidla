@@ -17,6 +17,7 @@
 
 package org.hoidla.window;
 
+import org.apache.commons.math3.stat.StatUtils;
 import org.hoidla.util.ExplicitlyTimeStamped;
 import org.hoidla.util.ImplicitlyTimeStamped;
 import org.hoidla.util.TimeStamped;
@@ -28,8 +29,9 @@ import org.hoidla.util.TimeStamped;
 public  class WindowUtils {
 
 	/**
+	 * Converts size bound window to array of doubles
 	 * @param window
-	 * @return
+	 * @return array of doubles
 	 */
 	public static <T> double[] getDoubleArray1(SizeBoundWindow<T> window) {
 		double[] data = new double[window.size()];
@@ -47,8 +49,9 @@ public  class WindowUtils {
 	}
 
 	/**
+	 * Converts time bound window to array of bytes
 	 * @param window
-	 * @return
+	 * @return array of doubles
 	 */
 	public static  double[] getDoubleArray1(TimeBoundWindow window) {
 		double[] data = new double[window.size()];
@@ -71,5 +74,92 @@ public  class WindowUtils {
 			}
 		}
 		return data;
+	}
+	
+	/**
+	 * Mean
+	 * @param window
+	 * @return
+	 */
+	public static <T> double getMean(SizeBoundWindow<T> window) {
+		double[] data = getDoubleArray1(window);
+		return StatUtils.mean(data);
+	}
+	
+	/**
+	 * Std dev
+	 * @param window
+	 * @return
+	 */
+	public static <T> double getStdDev(SizeBoundWindow<T> window) {
+		double[] data = getDoubleArray1(window);
+		return Math.sqrt(StatUtils.variance(data));
+	}
+
+	/**
+	 * Median
+	 * @param window
+	 * @return
+	 */
+	public static <T> double getMedian(SizeBoundWindow<T> window) {
+		double[] data = getDoubleArray1(window);
+		return StatUtils.percentile(data, 50);
+	}
+
+	/**
+	 * Mean
+	 * @param window
+	 * @return
+	 */
+	public static <T> double getMean(TimeBoundWindow window) {
+		double[] data = getDoubleArray1(window);
+		return StatUtils.mean(data);
+	}
+	
+	/**
+	 * Std dev
+	 * @param window
+	 * @return
+	 */
+	public static <T> double getStdDev(TimeBoundWindow window) {
+		double[] data = getDoubleArray1(window);
+		return Math.sqrt(StatUtils.variance(data));
+	}
+
+	/**
+	 * Median
+	 * @param window
+	 * @return
+	 */
+	public static <T> double getMedian(TimeBoundWindow window) {
+		double[] data = getDoubleArray1(window);
+		return StatUtils.percentile(data, 50);
+	}
+	
+	/**
+	 * Mean
+	 * @param window
+	 * @return
+	 */
+	public static double getMean(double[] data) {
+		return StatUtils.mean(data);
+	}
+	
+	/**
+	 * Std dev
+	 * @param window
+	 * @return
+	 */
+	public static double getStdDev(double[] data) {
+		return Math.sqrt(StatUtils.variance(data));
+	}
+
+	/**
+	 * Median
+	 * @param window
+	 * @return
+	 */
+	public static double getMedian(double[] data) {
+		return StatUtils.percentile(data, 50);
 	}
 }
