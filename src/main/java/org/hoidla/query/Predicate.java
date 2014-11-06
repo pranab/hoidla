@@ -18,7 +18,7 @@
 package org.hoidla.query;
 
 /**
- * Evaluates simple predicate
+ * Evaluates simple predicate applicable to raw data or some scalar function of the raw data
  * @author pranab
  *
  */
@@ -27,6 +27,7 @@ public class Predicate {
 	private String operator;
 	private double value;
 	private int percentTrue;
+	private double turningPointThreshold;
 	
 	public static final String OPERATOR_GT = "gt";
 	public static final String OPERATOR_LT = "lt";
@@ -38,6 +39,7 @@ public class Predicate {
 	public static final String OPERAND_STD_DEV = "stdDev";
 	public static final String OPERAND_MEDIAN = "median";
 	public static final String OPERAND_ENTROPY = "entropy";
+	public static final String OPERAND_TURNING_POINT = "turningPoint";
 	
 	
 	public Predicate() {
@@ -123,7 +125,15 @@ public class Predicate {
 		this.percentTrue = percentTrue;
 	}
 
+	public double getTurningPointThreshold() {
+		return turningPointThreshold;
+	}
+
+	public void setTurningPointThreshold(double turningPointThreshold) {
+		this.turningPointThreshold = turningPointThreshold;
+	}
+
 	public boolean isOperandScalar() {
-		return !operand.equals(OPERAND_NONE);
+		return !operand.equals(OPERAND_NONE) && !operand.equals(OPERAND_TURNING_POINT);
 	}
 }

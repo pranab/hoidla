@@ -97,6 +97,7 @@ public class Criteria {
 			} else if (operand.equals(Predicate.OPERAND_ENTROPY)) {
 				opValue = WindowUtils.getEntropy(intData);
 			}
+			operandValues.put(operand, opValue);
 		}
 		
 		return opValue;
