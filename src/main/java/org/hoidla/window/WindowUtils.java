@@ -34,7 +34,7 @@ public  class WindowUtils {
 	 * @param window
 	 * @return array of doubles
 	 */
-	public static <T> double[] getDoubleArray1(SizeBoundWindow<T> window) {
+	public static <T> double[] getDoubleArray(SizeBoundWindow<T> window) {
 		double[] data = new double[window.size()];
 		for (int i = 0; i < window.size(); ++i) {
 			T item  = window.get(i);
@@ -131,7 +131,7 @@ public  class WindowUtils {
 	 * @return
 	 */
 	public static <T> double getMean(SizeBoundWindow<T> window) {
-		double[] data = getDoubleArray1(window);
+		double[] data = getDoubleArray(window);
 		return StatUtils.mean(data);
 	}
 	
@@ -141,7 +141,7 @@ public  class WindowUtils {
 	 * @return
 	 */
 	public static <T> double getStdDev(SizeBoundWindow<T> window) {
-		double[] data = getDoubleArray1(window);
+		double[] data = getDoubleArray(window);
 		return Math.sqrt(StatUtils.variance(data));
 	}
 
@@ -151,7 +151,7 @@ public  class WindowUtils {
 	 * @return
 	 */
 	public static <T> double getMedian(SizeBoundWindow<T> window) {
-		double[] data = getDoubleArray1(window);
+		double[] data = getDoubleArray(window);
 		return StatUtils.percentile(data, 50);
 	}
 

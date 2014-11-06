@@ -1,5 +1,5 @@
 /*
- * hoidla: various algorithms for Big Data solutions
+ * hoidla: various streaming algorithms for Big Data solutions
  * Author: Pranab Ghosh
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); you
