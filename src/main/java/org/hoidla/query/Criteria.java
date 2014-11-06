@@ -59,8 +59,21 @@ public class Criteria {
 		intData = WindowUtils.getIntArray(window);
 		for (Predicate pred : predicates) {
 			String operand = pred.getOperand();
-			double opValue = getOperandValue(operand);
-			result = result && pred.evaluate(opValue);
+			if (pred.isOperandScalar()) {
+				//operand is a scalar stats summary of data
+				double opValue = getOperandValue(operand);
+				result = result && pred.evaluate(opValue);
+			} else {
+				//vector operation with raw data
+				int trueCount = 0;
+				for (double value : data) {
+					if (pred.evaluate(value)) {
+						++trueCount;
+					}
+				}
+				int minTrueCount = (pred.getPercentTrue() * window.size()) / 100;
+				result = result && trueCount >= minTrueCount;
+			}
 			if (!result) {
 				break;
 			}

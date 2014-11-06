@@ -26,12 +26,14 @@ public class Predicate {
 	private String operand;
 	private String operator;
 	private double value;
+	private int percentTrue;
 	
 	public static final String OPERATOR_GT = "gt";
 	public static final String OPERATOR_LT = "lt";
 	public static final String OPERATOR_GE = "ge";
 	public static final String OPERATOR_LE = "le";
 	
+	public static final String OPERAND_NONE = "none";
 	public static final String OPERAND_MEAN = "mean";
 	public static final String OPERAND_STD_DEV = "stdDev";
 	public static final String OPERAND_MEDIAN = "median";
@@ -51,6 +53,7 @@ public class Predicate {
 		this.operand = operand;
 		this.operator = operator;
 		this.value = value;
+		
 	}
 	
 	/**
@@ -110,5 +113,17 @@ public class Predicate {
 
 	public void setValue(double value) {
 		this.value = value;
+	}
+	
+	public int getPercentTrue() {
+		return percentTrue;
+	}
+
+	public void setPercentTrue(int percentTrue) {
+		this.percentTrue = percentTrue;
+	}
+
+	public boolean isOperandScalar() {
+		return !operand.equals(OPERAND_NONE);
 	}
 }
