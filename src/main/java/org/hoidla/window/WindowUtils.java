@@ -17,6 +17,7 @@
 
 package org.hoidla.window;
 
+import org.apache.commons.math3.stat.Frequency;
 import org.apache.commons.math3.stat.StatUtils;
 import org.hoidla.util.ExplicitlyTimeStamped;
 import org.hoidla.util.ImplicitlyTimeStamped;
@@ -49,11 +50,31 @@ public  class WindowUtils {
 	}
 
 	/**
+	 * Converts size bound window to array of doubles
+	 * @param window
+	 * @return array of doubles
+	 */
+	public static <T> int[] getIntArray(SizeBoundWindow<T> window) {
+		int[] data = new int[window.size()];
+		for (int i = 0; i < window.size(); ++i) {
+			T item  = window.get(i);
+			if (item instanceof Integer) {
+				data[i] = (Integer)item;
+			} else if (item instanceof Long) {
+				data[i] = (Integer)item;
+			} else if (item instanceof Double) {
+				data[i] = (Integer)item;
+			}
+		}
+		return data;
+	}
+
+	/**
 	 * Converts time bound window to array of bytes
 	 * @param window
 	 * @return array of doubles
 	 */
-	public static  double[] getDoubleArray1(TimeBoundWindow window) {
+	public static  double[] getDoubleArray(TimeBoundWindow window) {
 		double[] data = new double[window.size()];
 		for (int i = 0; i < window.size(); ++i) {
 			TimeStamped timeStapmed  = window.get(i);
@@ -76,6 +97,34 @@ public  class WindowUtils {
 		return data;
 	}
 	
+	/**
+	 * Converts time bound window to array of bytes
+	 * @param window
+	 * @return array of doubles
+	 */
+	public static  int[] getIntArray(TimeBoundWindow window) {
+		int[] data = new int[window.size()];
+		for (int i = 0; i < window.size(); ++i) {
+			TimeStamped timeStapmed  = window.get(i);
+			Object value = null;
+			if (timeStapmed instanceof ExplicitlyTimeStamped) {
+				value = ((ExplicitlyTimeStamped)timeStapmed).getValue();
+			} else if (timeStapmed instanceof ExplicitlyTimeStamped) {
+				value = ((ImplicitlyTimeStamped)timeStapmed).getValue();
+			} 
+			
+			//value
+			if (value instanceof Integer) {
+				data[i] = (Integer)value;
+			} else if (value instanceof Long) {
+				data[i] = (Integer)value;
+			} else if (value instanceof Double) {
+				data[i] = (Integer)value;
+			}
+		}
+		return data;
+	}
+
 	/**
 	 * Mean
 	 * @param window
@@ -107,12 +156,21 @@ public  class WindowUtils {
 	}
 
 	/**
+	 * @param window
+	 * @return
+	 */
+	public static <T> double getEntropy(SizeBoundWindow<T> window) {
+		int[] data = getIntArray(window);
+		return getEntropy(data);
+	}
+	
+	/**
 	 * Mean
 	 * @param window
 	 * @return
 	 */
 	public static <T> double getMean(TimeBoundWindow window) {
-		double[] data = getDoubleArray1(window);
+		double[] data = getDoubleArray(window);
 		return StatUtils.mean(data);
 	}
 	
@@ -121,8 +179,8 @@ public  class WindowUtils {
 	 * @param window
 	 * @return
 	 */
-	public static <T> double getStdDev(TimeBoundWindow window) {
-		double[] data = getDoubleArray1(window);
+	public static double getStdDev(TimeBoundWindow window) {
+		double[] data = getDoubleArray(window);
 		return Math.sqrt(StatUtils.variance(data));
 	}
 
@@ -131,9 +189,18 @@ public  class WindowUtils {
 	 * @param window
 	 * @return
 	 */
-	public static <T> double getMedian(TimeBoundWindow window) {
-		double[] data = getDoubleArray1(window);
+	public static double getMedian(TimeBoundWindow window) {
+		double[] data = getDoubleArray(window);
 		return StatUtils.percentile(data, 50);
+	}
+
+	/**
+	 * @param window
+	 * @return
+	 */
+	public static double getEntropy(TimeBoundWindow window) {
+		int[] data = getIntArray(window);
+		return getEntropy(data);
 	}
 	
 	/**
@@ -162,4 +229,38 @@ public  class WindowUtils {
 	public static double getMedian(double[] data) {
 		return StatUtils.percentile(data, 50);
 	}
+
+	/**
+	 * calculates entropy
+	 * @param data
+	 * @return
+	 */
+	public static double getEntropy(int[] data) {
+		double entropy = 0;
+		int min = Integer.MAX_VALUE;
+		int max = Integer.MIN_VALUE;
+		
+		//freq distribution
+		Frequency freq = new Frequency();
+		for (int item : data) {
+			freq.addValue(item);
+			if (item < min){
+				min = item;
+			}
+			if (item > max){
+				max = item;
+			}
+		}
+		
+		//calculate entropy
+		for (int v = min; v <= max; ++v) {
+			double pr = freq.getPct(v);
+			if (pr > 0) {
+				entropy += -pr * Math.log(pr);
+			}
+		}
+		
+		return entropy;
+	}
+	
 }
