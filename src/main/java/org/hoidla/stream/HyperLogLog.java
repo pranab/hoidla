@@ -20,6 +20,8 @@ package org.hoidla.stream;
 
 import org.hoidla.stream.UniqueItems.UniqueItemsCounter;
 import org.hoidla.util.Hashing;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Hyper Log Log algorithm for cardinality estimation by Flajolet, Fusy, Gandouet and 
@@ -33,6 +35,7 @@ public class HyperLogLog implements UniqueItemsCounter {
 	private int[] buckets;
 	private double biasCorrection;
 	private long count;
+	private static final Logger LOG = LoggerFactory.getLogger(HyperLogLog.class);
 	
 	/**
 	 * @param numBucketBits
@@ -74,7 +77,8 @@ public class HyperLogLog implements UniqueItemsCounter {
 	 */
 	private void calculateBiasCorrection() {
 		double c = Math.log(2);
-		biasCorrection = 1.0 / (2.0 * c  * (1.0 + (3.0 * c -1) / bucketCount));
+		biasCorrection = 1.0 / (2.0 * c  * (1.0 + (3.0 * c - 1) / bucketCount));
+		LOG.info("biasCorrection:" + biasCorrection);
 	}
 	
 	/* (non-Javadoc)
@@ -83,12 +87,30 @@ public class HyperLogLog implements UniqueItemsCounter {
 	@Override
 	public long getUnqueCount() {
 		double sum = 0;
+		int zeroCounts = 0;
 		for (int i = 0; i < bucketCount; ++i) {
-			sum += 1.0 / (1 << buckets[i]) ;
+			sum += 1.0 / (1 << buckets[i]);
+			if (buckets[i] == 0) {
+				++zeroCounts;
+			}
 		}
-		return Math.round(biasCorrection / sum);
+		long uniqueCount =  Math.round(biasCorrection / sum);
+		LOG.info("getUniqueCount sum:" + sum + " uniqueCount:" + uniqueCount);
+		if (uniqueCount < 2 * bucketCount) {
+			uniqueCount = countiLinear(zeroCounts);
+			LOG.info("using linear counting");
+		}
+		return uniqueCount;
 	}
 
+	/**
+	 * @param zeroCounts
+	 * @return
+	 */
+	private long countiLinear(int zeroCounts) {
+		return Math.round(bucketCount * Math.log(bucketCount / (double)zeroCounts));
+	}
+	
 	/* (non-Javadoc)
 	 * @see org.hoidla.stream.UniqueItems.UniqueItemsCounter#add(java.lang.Object)
 	 */
@@ -103,8 +125,9 @@ public class HyperLogLog implements UniqueItemsCounter {
 		int bucketIndex = hash >>> (Integer.SIZE  - numBucketBits);
 		
 		//hash for the bucket using remaining
-		int bucketHash = hash << numBucketBits | bucketCount;
+		int bucketHash = hash << numBucketBits | (bucketCount -1);
 		int leadZeros = Integer.numberOfLeadingZeros(bucketHash);
+		LOG.info("bucketIndex:" + bucketIndex + " leadZeros:" + leadZeros);
 		
 		//update
 		if (leadZeros > buckets[bucketIndex]) {
