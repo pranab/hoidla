@@ -95,8 +95,8 @@ public class HyperLogLog implements UniqueItemsCounter {
 			}
 		}
 		long uniqueCount =  Math.round(biasCorrection / sum);
-		LOG.info("getUniqueCount sum:" + sum + " uniqueCount:" + uniqueCount);
-		if (uniqueCount < 2 * bucketCount) {
+		LOG.info("getUniqueCount sum:" + sum + " uniqueCount:" + uniqueCount + " zeroCounts:" + zeroCounts);
+		if (uniqueCount < 2.5 * bucketCount) {
 			uniqueCount = countiLinear(zeroCounts);
 			LOG.info("using linear counting");
 		}
@@ -104,11 +104,12 @@ public class HyperLogLog implements UniqueItemsCounter {
 	}
 
 	/**
+	 * Estimator for small cardinality range
 	 * @param zeroCounts
 	 * @return
 	 */
 	private long countiLinear(int zeroCounts) {
-		return Math.round(bucketCount * Math.log(bucketCount / (double)zeroCounts));
+		return Math.round(bucketCount * Math.log((double)bucketCount / zeroCounts));
 	}
 	
 	/* (non-Javadoc)
