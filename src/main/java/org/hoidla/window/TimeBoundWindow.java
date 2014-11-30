@@ -29,38 +29,46 @@ import org.hoidla.util.TimeStamped;
 public class TimeBoundWindow extends DataWindow<TimeStamped>{
 	private long timeSpan;
 	private long timeStep = 0;
+	private long processingTimeStep = -1;
+	private long lastProcessedTime = -1;
 	
+	/**
+	 * @param timeSpan
+	 */
 	public TimeBoundWindow(long timeSpan) {
 		super(true);
 		this.timeSpan = timeSpan;
 	}
 	
+	/**
+	 * @param timeSpan
+	 * @param timeStep
+	 */
 	public TimeBoundWindow(long timeSpan, long timeStep) {
 		this(timeSpan);
 		this.timeStep = timeStep;
 	}
 
+	/**
+	 * @param timeSpan
+	 * @param timeStep
+	 */
+	public TimeBoundWindow(long timeSpan, long timeStep, long processingTimeStep) {
+		this(timeSpan, timeStep);
+		this.processingTimeStep = processingTimeStep;
+	}
+
 	@Override
 	public void expire() {
-		if (timeStep > 0) {
-			//slide by timeStep duration
-			TimeStamped earliest = getEarliest();
-			TimeStamped latest = getLatest();
-			if ((latest.getTimeStamp() - earliest.getTimeStamp()) > timeSpan) {
-				processFullWindow();
-				long earliestRetained = latest.getTimeStamp() - timeSpan + timeStep;
-				ListIterator<TimeStamped> iter =  dataWindow.listIterator();
-				while (iter.hasNext()) {
-					if (iter.next().getTimeStamp() < earliestRetained) {
-						iter.remove();
-					}
-				}
-			}
+		//slide by timeStep duration
+		TimeStamped earliest = getEarliest();
+		TimeStamped latest = getLatest();
+		if ((latest.getTimeStamp() - earliest.getTimeStamp()) > timeSpan) {
+			//process window
+			processFullWindowHelper(earliest, latest);
 			
-		} else {
-			//no time step
-			TimeStamped latest = getLatest();
-			long earliestRetained = latest.getTimeStamp() - timeSpan;
+			//manage window
+			long earliestRetained = latest.getTimeStamp() - timeSpan + timeStep;
 			ListIterator<TimeStamped> iter =  dataWindow.listIterator();
 			while (iter.hasNext()) {
 				if (iter.next().getTimeStamp() < earliestRetained) {
@@ -68,6 +76,28 @@ public class TimeBoundWindow extends DataWindow<TimeStamped>{
 				}
 			}
 		}
+	}
+	
+	/**
+	 * @param earliest
+	 * @param latest
+	 * @return
+	 */
+	private boolean processFullWindowHelper(TimeStamped earliest, TimeStamped latest) {
+		boolean processed = false;
+		if (processingTimeStep > 0 && lastProcessedTime > 0) {
+			if (latest.getTimeStamp() - lastProcessedTime > processingTimeStep) {
+				processFullWindow();
+				lastProcessedTime = latest.getTimeStamp();
+				processed = true;
+			}
+		} else {
+			processFullWindow();
+			lastProcessedTime = latest.getTimeStamp();
+			processed = true;
+		}
+		
+		return processed;
 	}
 
 	public boolean isFull() {
