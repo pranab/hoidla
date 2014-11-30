@@ -30,6 +30,7 @@ import java.util.LinkedList;
  */
 public abstract class DataWindow<T> {
 	protected AbstractList<T> dataWindow = null;
+	protected long count;
 	
 	public DataWindow(boolean withSequentialAccess) {
 		dataWindow = withSequentialAccess ? new LinkedList<T>() : new ArrayList<T>();
@@ -37,6 +38,7 @@ public abstract class DataWindow<T> {
 	
 	public void add(T obj) {
 		dataWindow.add(obj);
+		++count;
 		expire();
 	}
 	

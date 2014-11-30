@@ -43,6 +43,7 @@ public class TimeBoundWindow extends DataWindow<TimeStamped>{
 	@Override
 	public void expire() {
 		if (timeStep > 0) {
+			//slide by timeStep duration
 			TimeStamped earliest = getEarliest();
 			TimeStamped latest = getLatest();
 			if ((latest.getTimeStamp() - earliest.getTimeStamp()) > timeSpan) {
@@ -57,6 +58,7 @@ public class TimeBoundWindow extends DataWindow<TimeStamped>{
 			}
 			
 		} else {
+			//no time step
 			TimeStamped latest = getLatest();
 			long earliestRetained = latest.getTimeStamp() - timeSpan;
 			ListIterator<TimeStamped> iter =  dataWindow.listIterator();

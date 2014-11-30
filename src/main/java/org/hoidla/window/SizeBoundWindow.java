@@ -17,35 +17,59 @@
 
 package org.hoidla.window;
 
-import java.util.Iterator;
-import java.util.LinkedList;
 
 /**
+ * Sliding window bounded my a max size
  * @author pranab
  *
  */
 public class SizeBoundWindow<T> extends DataWindow<T>{
 	private int maxSize;
 	private int stepSize = 1;
+	private int processStepSize = 1;
 	
+	/**
+	 * @param maxSize
+	 */
 	public SizeBoundWindow(int maxSize) {
 		super(true);
 		this.maxSize = maxSize;
 	}
 	
+	/**
+	 * @param maxSize
+	 * @param stepSize
+	 */
 	public SizeBoundWindow(int maxSize, int stepSize) {
 		this(maxSize);
 		this.stepSize = stepSize;
 	}
 	
+	/**
+	 * @param maxSize
+	 * @param stepSize
+	 */
+	public SizeBoundWindow(int maxSize, int stepSize, int processStepSize) {
+		this(maxSize, stepSize);
+		this.processStepSize = processStepSize;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.hoidla.window.DataWindow#expire()
+	 */
 	public void expire() {
 		if (dataWindow.size() > maxSize) {
-			if (stepSize > 1) {
+			//process window data
+			if (count % processStepSize == 0) {
 				processFullWindow();
 			}
+			
+			//manage window
 			if (stepSize == maxSize) {
+				//tumble
 				dataWindow.clear();
 			} else {
+				//slide by stepSize
 				for (int i = 0; i < stepSize; ++i) {
 					dataWindow.remove(0);
 				}
