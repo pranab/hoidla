@@ -17,8 +17,12 @@
 
 package org.hoidla.window;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.apache.commons.math3.stat.Frequency;
 import org.apache.commons.math3.stat.StatUtils;
+import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
 import org.hoidla.util.ExplicitlyTimeStamped;
 import org.hoidla.util.ImplicitlyTimeStamped;
 import org.hoidla.util.TimeStamped;
@@ -229,7 +233,80 @@ public  class WindowUtils {
 	public static double getMedian(double[] data) {
 		return StatUtils.percentile(data, 50);
 	}
+	
+	/**
+	 * Identifies outliers
+	 * @param data
+	 * @param outlierThresholdFactor
+	 * @return indexes outlying data points
+	 */
+	public static List<Integer> removeOutliers(double[] data, double[] pattern, int outlierThresholdFactor) {
+		//stats
+		SummaryStatistics stats = new SummaryStatistics();
+		for (double value : data) {
+			stats.addValue(value);
+		}
+		double mean = stats.getMean();
+		double stdDev = stats.getStandardDeviation();
+		
+		//thresholds
+		double upThreshold = mean + outlierThresholdFactor * stdDev;
+		double loThreshold = mean - outlierThresholdFactor * stdDev;
+		
+		List<Integer> outliers = new ArrayList<Integer>();
+		int i = 0;
+		for (double value : data) {
+			if (value > upThreshold || value < loThreshold) {
+				//replace with pattern value so that there is no net effect
+				if (null != pattern) {
+					data[i] = pattern[i];
+				}
+				outliers.add(i);
+			}
+			++i;
+		}
+		
+		return outliers;
+	}
+	
+	/**
+	 * @param data
+	 * @param pattern
+	 * @return
+	 */
+	public static double manhattanDistance(double[] data, double[] pattern) {
+		if (data.length != pattern.length) {
+			throw new IllegalArgumentException("data and pattern need to be of same size");
+		}
+		double dist = 0;
+		int i = 0;
+		for (double value : data) {
+			dist += Math.abs(value - pattern[i]);
+			++i;
+		}		
+		dist /= data.length;
+		return dist;
+	}
 
+	/**
+	 * @param data
+	 * @param pattern
+	 * @return
+	 */
+	public static double euclideanDistance(double[] data, double[] pattern) {
+		if (data.length != pattern.length) {
+			throw new IllegalArgumentException("data and pattern need to be of same size");
+		}
+		double dist = 0;
+		int i = 0;
+		for (double value : data) {
+			dist += (value - pattern[i]) * (value - pattern[i]);
+			++i;
+		}		
+		dist = Math.sqrt(dist) / data.length;
+		return dist;
+	}
+	
 	/**
 	 * calculates entropy
 	 * @param data
