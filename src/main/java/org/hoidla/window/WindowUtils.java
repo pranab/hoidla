@@ -332,7 +332,7 @@ public  class WindowUtils {
 	public static double[] cumultiveDiffSum(double[] data, double target) {
 		double[] cuDiffSum = new double[data.length];
 		
-		//cumulative sum of difference from target. Slope upward : average above target
+		//cumulative sum of difference from target. 
 		double sum = 0;
 		for (int i = 0; i < data.length; ++i) {
 			sum += data[i] - target;
