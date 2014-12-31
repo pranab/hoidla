@@ -43,7 +43,6 @@ public class Predicate {
 	
 	
 	public Predicate() {
-		
 	}
 	
 	/**
@@ -55,9 +54,35 @@ public class Predicate {
 		this.operand = operand;
 		this.operator = operator;
 		this.value = value;
-		
+	}
+
+	/**
+	 * @param operand
+	 * @return
+	 */
+	public Predicate withOperand(String operand) {
+		this.operand = operand;
+		return this;
 	}
 	
+	/**
+	 * @param operator
+	 * @return
+	 */
+	public Predicate withOperator(String operator) {
+		this.operator = operator;
+		return this;
+	}
+
+	/**
+	 * @param value
+	 * @return
+	 */
+	public Predicate withValue(double value) {
+		this.value = value;
+		return this;
+	}
+
 	/**
 	 * @param operator
 	 * @param value

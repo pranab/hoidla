@@ -17,6 +17,7 @@
 
 package org.hoidla.query;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -25,15 +26,20 @@ import org.hoidla.window.SizeBoundWindow;
 import org.hoidla.window.WindowUtils;
 
 /**
- * Evaluates a list conjunctive predicates 
+ * Evaluates a disjunctive criteria consisting list of conjunctive predicates.
+ * Essentially processes a list of predicates connected by and or or operators.
+ * No support for comples expressions
  * @author pranab
  *
  */
 public class Criteria {
-	private List<Predicate> predicates;
+	private List<Predicate> predicates = new ArrayList<Predicate>();
 	private double[] data;
 	private int[] intData;
 	private Map<String, Double> operandValues = new HashMap<String, Double>();
+	public static final String OPERATOR_AND = "and";
+	public static final String OPERATOR_OR = "or";
+	private List<String> operators = new ArrayList<String>();
 	
 	/**
 	 * @return
@@ -50,19 +56,60 @@ public class Criteria {
 	}
 	
 	/**
+	 * @param predicate
+	 * @return
+	 */
+	public Criteria withPredicate(Predicate predicate) {
+		predicates.add(predicate);
+		return this;
+	}
+	
+	/**
+	 * @return
+	 */
+	public Criteria withAnd() {
+		operators.add(OPERATOR_AND);
+		return this;
+	}
+	
+	
+	/**
+	 * @return
+	 */
+	public Criteria withOr() {
+		operators.add(OPERATOR_OR);
+		return this;
+	}
+
+	/**
 	 * @param window
 	 * @return
 	 */
 	public<T> boolean evaluate(SizeBoundWindow<T> window) {
+		if (operators.size() != predicates.size() -1) {
+			throw new IllegalArgumentException("invalid criteria expression");
+		}
+		
+		List<Boolean> conjuctResults = new ArrayList<Boolean>();
 		boolean result = true;
 		data = WindowUtils.getDoubleArray(window);
 		intData = WindowUtils.getIntArray(window);
+		int i = 0;
 		for (Predicate pred : predicates) {
 			String operand = pred.getOperand();
 			if (pred.isOperandScalar()) {
 				//operand is a scalar stats summary of data
 				double opValue = getOperandValue(operand);
-				result = result && pred.evaluate(opValue);
+				if (operators.get(i).equals(OPERATOR_AND)) {
+					//continue with current conjunctive
+					if (result) {
+						result = result && pred.evaluate(opValue);
+					}
+				} else {
+					//start new conjunctive
+					conjuctResults.add(result);
+					result = true;
+				}
 			} else {
 				//vector operation with raw data
 				int trueCount = 0;
@@ -72,13 +119,33 @@ public class Criteria {
 					}
 				}
 				int minTrueCount = (pred.getPercentTrue() * window.size()) / 100;
-				result = result && trueCount >= minTrueCount;
+				if (operators.get(i).equals(OPERATOR_AND)) {
+					//continue with current conjunctive
+					if (result) {
+						result = result && trueCount >= minTrueCount;
+					}
+				}else {
+					//start new conjunctive
+					conjuctResults.add(result);
+					result = true;
+				}
 			}
-			if (!result) {
+			++i;
+		}
+		
+		//last conjunct
+		conjuctResults.add(result);
+		
+		//process conjuctives
+		boolean finalResult = false;
+		for (boolean conRes : conjuctResults ) {
+			finalResult = finalResult || conRes;
+			if (finalResult) {
 				break;
 			}
 		}
-		return result;
+		
+		return finalResult;
 	}
 	
 	/**
@@ -86,6 +153,7 @@ public class Criteria {
 	 * @return
 	 */
 	private double getOperandValue(String operand) {
+		//try cache first
 		Double opValue = operandValues.get(operand);
 		if (null == opValue) {
 			if (operand.equals(Predicate.OPERAND_MEAN)) {
