@@ -17,6 +17,7 @@
 
 package org.hoidla.query;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -32,7 +33,7 @@ import org.hoidla.window.WindowUtils;
  * @author pranab
  *
  */
-public class Criteria {
+public class Criteria implements Serializable {
 	private List<Predicate> predicates = new ArrayList<Predicate>();
 	private double[] data;
 	private int[] intData;
@@ -100,7 +101,10 @@ public class Criteria {
 			if (pred.isOperandScalar()) {
 				//operand is a scalar stats summary of data
 				double opValue = getOperandValue(operand);
-				if (operators.get(i).equals(OPERATOR_AND)) {
+				if (i == 0) {
+					//first operand
+					result = pred.evaluate(opValue);
+				} else if (operators.get(i - 1).equals(OPERATOR_AND)) {
 					//continue with current conjunctive
 					if (result) {
 						result = result && pred.evaluate(opValue);
@@ -108,7 +112,7 @@ public class Criteria {
 				} else {
 					//start new conjunctive
 					conjuctResults.add(result);
-					result = true;
+					result = pred.evaluate(opValue);
 				}
 			} else {
 				//vector operation with raw data

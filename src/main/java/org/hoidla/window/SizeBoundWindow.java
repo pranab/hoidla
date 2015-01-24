@@ -17,16 +17,21 @@
 
 package org.hoidla.window;
 
+import java.io.Serializable;
+
 
 /**
  * Sliding window bounded my a max size
  * @author pranab
  *
  */
-public class SizeBoundWindow<T> extends DataWindow<T>{
+public class SizeBoundWindow<T> extends DataWindow<T> implements Serializable {
 	private int maxSize;
 	private int stepSize = 1;
 	private int processStepSize = 1;
+	
+	public SizeBoundWindow() {
+	}
 	
 	/**
 	 * @param maxSize
@@ -79,5 +84,29 @@ public class SizeBoundWindow<T> extends DataWindow<T>{
 	
 	public boolean isFull() {
 		return dataWindow.size() == maxSize;
+	}
+
+	public int getMaxSize() {
+		return maxSize;
+	}
+
+	public void setMaxSize(int maxSize) {
+		this.maxSize = maxSize;
+	}
+
+	public int getStepSize() {
+		return stepSize;
+	}
+
+	public void setStepSize(int stepSize) {
+		this.stepSize = stepSize;
+	}
+
+	public int getProcessStepSize() {
+		return processStepSize;
+	}
+
+	public void setProcessStepSize(int processStepSize) {
+		this.processStepSize = processStepSize;
 	}
 }

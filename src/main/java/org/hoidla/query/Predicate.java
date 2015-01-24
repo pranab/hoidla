@@ -17,12 +17,14 @@
 
 package org.hoidla.query;
 
+import java.io.Serializable;
+
 /**
  * Evaluates simple predicate applicable to raw data or some scalar function of the raw data
  * @author pranab
  *
  */
-public class Predicate {
+public class Predicate implements Serializable {
 	private String operand;
 	private String operator;
 	private double value;
