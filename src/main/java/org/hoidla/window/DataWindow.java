@@ -40,6 +40,9 @@ public abstract class DataWindow<T> {
 	}
 	
 	public void add(T obj) {
+		if (null == dataWindow) {
+			dataWindow = new ArrayList<T>();
+		}
 		dataWindow.add(obj);
 		++count;
 		expire();

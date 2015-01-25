@@ -149,6 +149,7 @@ public class Criteria implements Serializable {
 			}
 		}
 		
+		operandValues.clear();
 		return finalResult;
 	}
 	
