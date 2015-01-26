@@ -17,6 +17,7 @@
 
 package org.hoidla.window;
 
+import java.io.Serializable;
 import java.util.ListIterator;
 
 import org.hoidla.util.TimeStamped;
@@ -26,7 +27,7 @@ import org.hoidla.util.TimeStamped;
  * @author pranab
  *
  */
-public class TimeBoundWindow extends DataWindow<TimeStamped>{
+public class TimeBoundWindow extends DataWindow<TimeStamped> implements Serializable {
 	private long timeSpan;
 	private long timeStep = 0;
 	private long processingTimeStep = -1;

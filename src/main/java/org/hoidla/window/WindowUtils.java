@@ -169,6 +169,62 @@ public  class WindowUtils {
 	}
 	
 	/**
+	 * upper level detector
+	 * @param window
+	 * @param threshold
+	 * @return
+	 */
+	public static <T> boolean allValuesAbove(SizeBoundWindow<T> window, double threshold) {
+		double[] data = getDoubleArray(window);
+		return allValuesAbove(data, threshold);
+	}
+	
+	/**
+	 * upper level detector
+	 * @param window
+	 * @param threshold
+	 * @return
+	 */
+	public static <T> boolean allValuesAbove(double[] data , double threshold) {
+		boolean allAbove = true;
+		for (double value : data) {
+			if (value < threshold) {
+				allAbove = false;
+				break;
+			}
+		}
+		return allAbove;
+	}
+
+	/**
+	 * lower level detector
+	 * @param window
+	 * @param threshold
+	 * @return
+	 */
+	public static <T> boolean allValuesBelow(SizeBoundWindow<T> window, double threshold) {
+		double[] data = getDoubleArray(window);
+		return allValuesBelow(data, threshold);
+	}
+	
+	/**
+	 * lower level detector
+	 * @param window
+	 * @param threshold
+	 * @return
+	 */
+	public static <T> boolean allValuesBelow(double[] data, double threshold) {
+		boolean allBelow = true;
+		for (double value : data) {
+			if (value > threshold) {
+				allBelow = false;
+				break;
+			}
+		}
+		return allBelow;
+	}
+
+	/**
 	 * Mean
 	 * @param window
 	 * @return
@@ -206,7 +262,43 @@ public  class WindowUtils {
 		int[] data = getIntArray(window);
 		return getEntropy(data);
 	}
+
+	/**
+	 * upper level detector
+	 * @param window
+	 * @param threshold
+	 * @return
+	 */
+	public static <T> boolean allValuesAbove(TimeBoundWindow window, double threshold) {
+		double[] data = getDoubleArray(window);
+		boolean allAbove = true;
+		for (double value : data) {
+			if (value < threshold) {
+				allAbove = false;
+				break;
+			}
+		}
+		return allAbove;
+	}
 	
+	/**
+	 * lower level detector
+	 * @param window
+	 * @param threshold
+	 * @return
+	 */
+	public static <T> boolean allValuesBelow(TimeBoundWindow window, double threshold) {
+		double[] data = getDoubleArray(window);
+		boolean allBelow = true;
+		for (double value : data) {
+			if (value > threshold) {
+				allBelow = false;
+				break;
+			}
+		}
+		return allBelow;
+	}
+
 	/**
 	 * Mean
 	 * @param window

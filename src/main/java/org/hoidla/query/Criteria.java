@@ -97,22 +97,38 @@ public class Criteria implements Serializable {
 		intData = WindowUtils.getIntArray(window);
 		int i = 0;
 		for (Predicate pred : predicates) {
+			if (!pred.isRelational() && null == data) {
+				data = WindowUtils.getDoubleArray(window);
+			}
+			
 			String operand = pred.getOperand();
 			if (pred.isOperandScalar()) {
 				//operand is a scalar stats summary of data
-				double opValue = getOperandValue(operand);
+				double opValue = getOperandValue(pred);
 				if (i == 0) {
 					//first operand
-					result = pred.evaluate(opValue);
+					if (pred.isRelational()) {
+						result = pred.evaluate(opValue);
+					} else {
+						result = pred.evaluate(data);
+					}
 				} else if (operators.get(i - 1).equals(OPERATOR_AND)) {
 					//continue with current conjunctive
 					if (result) {
-						result = result && pred.evaluate(opValue);
+						if (pred.isRelational()) {
+							result = result && pred.evaluate(opValue);
+						} else {
+							result = result && pred.evaluate(data);
+						}
 					}
 				} else {
 					//start new conjunctive
 					conjuctResults.add(result);
-					result = pred.evaluate(opValue);
+					if (pred.isRelational()) {
+						result = pred.evaluate(opValue);
+					} else {
+						result = pred.evaluate(data);
+					}
 				}
 			} else {
 				//vector operation with raw data
@@ -157,8 +173,9 @@ public class Criteria implements Serializable {
 	 * @param operand
 	 * @return
 	 */
-	private double getOperandValue(String operand) {
+	private double getOperandValue(Predicate pred) {
 		//try cache first
+		String operand = pred.getOperand();
 		Double opValue = operandValues.get(operand);
 		if (null == opValue) {
 			if (operand.equals(Predicate.OPERAND_MEAN)) {

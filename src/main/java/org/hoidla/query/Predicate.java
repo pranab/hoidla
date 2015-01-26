@@ -19,6 +19,8 @@ package org.hoidla.query;
 
 import java.io.Serializable;
 
+import org.hoidla.window.WindowUtils;
+
 /**
  * Evaluates simple predicate applicable to raw data or some scalar function of the raw data
  * @author pranab
@@ -30,6 +32,8 @@ public class Predicate implements Serializable {
 	private double value;
 	private int percentTrue;
 	private double turningPointThreshold;
+	private boolean relational;
+	private Object[] parameters;
 	
 	public static final String OPERATOR_GT = "gt";
 	public static final String OPERATOR_LT = "lt";
@@ -42,6 +46,8 @@ public class Predicate implements Serializable {
 	public static final String OPERAND_MEDIAN = "median";
 	public static final String OPERAND_ENTROPY = "entropy";
 	public static final String OPERAND_TURNING_POINT = "turningPoint";
+	public static final String OPERAND_ABOVE_THRESHOLD = "aboveThreshold";
+	public static final String OPERAND_BELOW_THRESHOLD = "belowThreshold";
 	
 	
 	public Predicate() {
@@ -56,6 +62,7 @@ public class Predicate implements Serializable {
 		this.operand = operand;
 		this.operator = operator;
 		this.value = value;
+		relational = true;
 	}
 
 	/**
@@ -73,6 +80,7 @@ public class Predicate implements Serializable {
 	 */
 	public Predicate withOperator(String operator) {
 		this.operator = operator;
+		relational = true;
 		return this;
 	}
 
@@ -86,6 +94,15 @@ public class Predicate implements Serializable {
 	}
 
 	/**
+	 * @param parameters
+	 * @return
+	 */
+	public Predicate withParameters(Object... parameters ) {
+		this.parameters = parameters;
+		return this;
+	}
+	
+	/**
 	 * @param operator
 	 * @param value
 	 */
@@ -94,13 +111,23 @@ public class Predicate implements Serializable {
 		this.value = value;
 	}
 
+	/**
+	 * functional predicate
+	 * @param data
+	 * @return
+	 */
 	public boolean evaluate(double[] data) {
 		boolean result = false;
-		
+		if (operand.equals(OPERAND_ABOVE_THRESHOLD)) {
+			result = WindowUtils.allValuesAbove(data, (Double)parameters[0]);
+		} else if (operand.equals(OPERAND_BELOW_THRESHOLD)) {
+			result = WindowUtils.allValuesBelow(data, (Double)parameters[0]);
+		}
 		return result;
 	}
 	
 	/**
+	 * relational predicate
 	 * @param operandValue
 	 * @return
 	 */
@@ -120,6 +147,7 @@ public class Predicate implements Serializable {
 		return result;
 	}
 
+	
 	public String getOperand() {
 		return operand;
 	}
@@ -162,5 +190,21 @@ public class Predicate implements Serializable {
 
 	public boolean isOperandScalar() {
 		return !operand.equals(OPERAND_NONE) && !operand.equals(OPERAND_TURNING_POINT);
+	}
+
+	public boolean isRelational() {
+		return relational;
+	}
+
+	public void setRelational(boolean relational) {
+		this.relational = relational;
+	}
+
+	public Object[] getParameters() {
+		return parameters;
+	}
+
+	public void setParameters(Object[] parameters) {
+		this.parameters = parameters;
 	}
 }
