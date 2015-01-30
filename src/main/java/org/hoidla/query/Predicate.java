@@ -48,6 +48,8 @@ public class Predicate implements Serializable {
 	public static final String OPERAND_TURNING_POINT = "turningPoint";
 	public static final String OPERAND_ABOVE_THRESHOLD = "aboveThreshold";
 	public static final String OPERAND_BELOW_THRESHOLD = "belowThreshold";
+	public static final String OPERAND_ABOVE_THRESHOLD_WITH_MIN_COUNT = "aboveThresholdWithMinCount";
+	public static final String OPERAND_BELOW_THRESHOLD_WITH_MIN_COUNT = "belowThresholdWithMinCount";
 	
 	
 	public Predicate() {
@@ -122,6 +124,12 @@ public class Predicate implements Serializable {
 			result = WindowUtils.allValuesAbove(data, (Double)parameters[0]);
 		} else if (operand.equals(OPERAND_BELOW_THRESHOLD)) {
 			result = WindowUtils.allValuesBelow(data, (Double)parameters[0]);
+		} else if (operand.equals(OPERAND_ABOVE_THRESHOLD_WITH_MIN_COUNT)) {
+			result = WindowUtils.valuesAbove(data, (Double)parameters[0], (Double)parameters[1]);
+		} else if (operand.equals(OPERAND_BELOW_THRESHOLD_WITH_MIN_COUNT)) {
+			result = WindowUtils.valuesBelow(data, (Double)parameters[0], (Double)parameters[1]);
+		} else {
+			throw new IllegalArgumentException("illegal functional predicate name");
 		}
 		return result;
 	}
