@@ -197,6 +197,34 @@ public  class WindowUtils {
 	}
 
 	/**
+	 * upper level detector
+	 * @param window
+	 * @param threshold
+	 * @return
+	 */
+	public static <T> boolean valuesAbove(SizeBoundWindow<T> window, double threshold, double countFraction) {
+		double[] data = getDoubleArray(window);
+		return valuesAbove(data, threshold, countFraction);
+	}
+	
+	/**
+	 * upper level detector
+	 * @param window
+	 * @param threshold
+	 * @return
+	 */
+	public static <T> boolean valuesAbove(double[] data , double threshold, double countFraction) {
+		int minCount = (int)(data.length * countFraction);
+		int count = 0;
+		for (double value : data) {
+			if (value >= threshold) {
+				++count;
+			}
+		}
+		return count >=  minCount;
+	}
+
+	/**
 	 * lower level detector
 	 * @param window
 	 * @param threshold
@@ -222,6 +250,36 @@ public  class WindowUtils {
 			}
 		}
 		return allBelow;
+	}
+
+	/**
+	 * upper level detector
+	 * @param window
+	 * @param threshold
+	 * @param countFraction threhhold min count
+	 * @return
+	 */
+	public static <T> boolean valuesBelow(SizeBoundWindow<T> window, double threshold, double countFraction) {
+		double[] data = getDoubleArray(window);
+		return valuesBelow(data, threshold, countFraction);
+	}
+	
+	/**
+	 * upper level detector
+	 * @param window
+	 * @param threshold
+	 * @param countFraction threhhold min count
+	 * @return
+	 */
+	public static <T> boolean valuesBelow(double[] data , double threshold, double countFraction) {
+		int minCount = (int)(data.length * countFraction);
+		int count = 0;
+		for (double value : data) {
+			if (value <= threshold) {
+				++count;
+			}
+		}
+		return count >=  minCount;
 	}
 
 	/**
@@ -271,15 +329,21 @@ public  class WindowUtils {
 	 */
 	public static <T> boolean allValuesAbove(TimeBoundWindow window, double threshold) {
 		double[] data = getDoubleArray(window);
-		boolean allAbove = true;
-		for (double value : data) {
-			if (value < threshold) {
-				allAbove = false;
-				break;
-			}
-		}
-		return allAbove;
+		return allValuesAbove(data, threshold);
 	}
+
+	/**
+	 * upper level detector
+	 * @param window
+	 * @param threshold threshold value
+	 * @param countFraction threhhold min count
+	 * @return
+	 */
+	public static <T> boolean valuesAbove(TimeBoundWindow window, double threshold, double countFraction) {
+		double[] data = getDoubleArray(window);
+		return valuesAbove(data, threshold, countFraction);
+	}
+	
 	
 	/**
 	 * lower level detector
@@ -289,16 +353,21 @@ public  class WindowUtils {
 	 */
 	public static <T> boolean allValuesBelow(TimeBoundWindow window, double threshold) {
 		double[] data = getDoubleArray(window);
-		boolean allBelow = true;
-		for (double value : data) {
-			if (value > threshold) {
-				allBelow = false;
-				break;
-			}
-		}
-		return allBelow;
+		return allValuesBelow(data, threshold);
 	}
 
+	/**
+	 * lower level detector
+	 * @param window
+	 * @param threshold
+	 * @param countFraction threhhold min count
+	 * @return
+	 */
+	public static <T> boolean valuesBelow(TimeBoundWindow window, double threshold, double countFraction) {
+		double[] data = getDoubleArray(window);
+		return valuesBelow(data, threshold, countFraction);
+	}	
+	
 	/**
 	 * Mean
 	 * @param window
