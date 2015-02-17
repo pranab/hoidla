@@ -104,7 +104,7 @@ public class Criteria implements Serializable {
 			String operand = pred.getOperand();
 			if (pred.isOperandScalar()) {
 				//operand is a scalar stats summary of data
-				double opValue = getOperandValue(pred);
+				double opValue = pred.isRelational()? getOperandValue(pred) : 0;
 				if (i == 0) {
 					//first operand
 					if (pred.isRelational()) {
@@ -186,6 +186,8 @@ public class Criteria implements Serializable {
 				opValue = WindowUtils.getMean(data);
 			} else if (operand.equals(Predicate.OPERAND_ENTROPY)) {
 				opValue = WindowUtils.getEntropy(intData);
+			} else {
+				throw new IllegalArgumentException("invalid operand:" + operand);
 			}
 			operandValues.put(operand, opValue);
 		}
