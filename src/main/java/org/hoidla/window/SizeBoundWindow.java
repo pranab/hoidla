@@ -26,7 +26,7 @@ import java.io.Serializable;
  *
  */
 public class SizeBoundWindow<T> extends DataWindow<T> implements Serializable {
-	private int maxSize;
+	protected int maxSize;
 	private int stepSize = 1;
 	private int processStepSize = 1;
 	
@@ -63,12 +63,13 @@ public class SizeBoundWindow<T> extends DataWindow<T> implements Serializable {
 	 * @see org.hoidla.window.DataWindow#expire()
 	 */
 	public void expire() {
+		//process window data
+		if (count % processStepSize == 0) {
+			processFullWindow();
+		}
+		
+		//slide window
 		if (dataWindow.size() > maxSize) {
-			//process window data
-			if (count % processStepSize == 0) {
-				processFullWindow();
-			}
-			
 			//manage window
 			if (stepSize == maxSize) {
 				//tumble
@@ -79,6 +80,9 @@ public class SizeBoundWindow<T> extends DataWindow<T> implements Serializable {
 					dataWindow.remove(0);
 				}
 			}
+			expired = true;
+		} else {
+			expired = false;
 		}
 	}
 	

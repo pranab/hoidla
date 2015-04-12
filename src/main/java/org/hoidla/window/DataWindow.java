@@ -31,6 +31,7 @@ import java.util.LinkedList;
 public abstract class DataWindow<T> {
 	protected AbstractList<T> dataWindow = null;
 	protected long count;
+	protected boolean expired;
 	
 	public DataWindow() {
 	}
@@ -97,5 +98,9 @@ public abstract class DataWindow<T> {
 
 	public void setCount(long count) {
 		this.count = count;
+	}
+
+	public boolean isExpired() {
+		return expired;
 	}
 }
