@@ -1,5 +1,5 @@
 /*
- * hoidla: various algorithms for Big Data solutions
+ * hoidla: various streaming algorithms for Big Data solutions
  * Author: Pranab Ghosh
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); you
@@ -15,90 +15,98 @@
  * permissions and limitations under the License.
  */
 
+
+
 package org.hoidla.window;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import org.hoidla.util.TimeStamped;
+import org.hoidla.util.TimeStampedFlag;
+
 /**
- * Analyzes locality of event
  * @author pranab
  *
  */
-public class SizeBoundEventLocalityAnalyzer extends SizeBoundWindow<Boolean> {
+public class TimeBoundEventLocalityAnalyzer extends TimeBoundWindow {
 	private int minOccurence = 1;
 	private long maxIntervalAverage = -1;
 	private long maxIntervalMax = -1;
-	private double score = 0;
-	
-	/**
-	 * @param maxSize
-	 * @param minOccurence
-	 * @param maxIntervalAverage
-	 * @param maxIntervalMax
-	 */
-	public SizeBoundEventLocalityAnalyzer(int maxSize, int minOccurence,
-			long maxIntervalAverage, long maxIntervalMax) {
-		super(maxSize);
-		this.minOccurence = minOccurence;
-		this.maxIntervalAverage = maxIntervalAverage;
-		this.maxIntervalMax = maxIntervalMax;
-	}
-	
-	/**
-	 * @param maxSize
-	 * @param minOccurence
-	 */
-	public SizeBoundEventLocalityAnalyzer(int maxSize, int minOccurence) {
-		super(maxSize);
-		this.minOccurence = minOccurence;
-	}
-	
-	/**
-	 * @param maxIntervalAverage
-	 * @return
-	 */
-	public SizeBoundEventLocalityAnalyzer withMaxIntervalAverage(long maxIntervalAverage) {
-		this.maxIntervalAverage = maxIntervalAverage;
-		return this;
-	}
-	
-	/**
-	 * @param maxIntervalMax
-	 * @return
-	 */
-	public SizeBoundEventLocalityAnalyzer withMaxIntervalMax(long maxIntervalMax) {
-		this.maxIntervalMax = maxIntervalMax;
-		return this;
-	}
+	private double score;
 
-	/* (non-Javadoc)
-	 * @see org.hoidla.window.DataWindow#processFullWindow()
+	private static final long serialVersionUID = -7873039731214593449L;
+
+	/**
+	 * @param timeSpan
+	 * @param minOccurence
 	 */
+	public TimeBoundEventLocalityAnalyzer(long timeSpan, int minOccurence) {
+		super(timeSpan);
+		this.minOccurence = minOccurence;
+	}
+	
+	/**
+	 * @param timeSpan
+	 * @param timeStep
+	 * @param minOccurence
+	 */
+	public TimeBoundEventLocalityAnalyzer(long timeSpan, long timeStep, int minOccurence) {
+		super(timeSpan, timeStep);
+		this.minOccurence = minOccurence;
+	}
+	
+	/**
+	 * @param timeSpan
+	 * @param timeStep
+	 * @param processingTimeStep
+	 * @param minOccurence
+	 */
+	public TimeBoundEventLocalityAnalyzer(long timeSpan, long timeStep, long processingTimeStep, int minOccurence) {
+		super(timeSpan, timeStep, processingTimeStep);
+		this.minOccurence = minOccurence;
+	}
+	
+	/**
+	 * @param maxIntervalAverage
+	 * @return
+	 */
+	public TimeBoundEventLocalityAnalyzer withMaxIntervalAverage(long maxIntervalAverage) {
+		this.maxIntervalAverage = maxIntervalAverage;
+		return this;
+	}
+	
+	/**
+	 * @param maxIntervalMax
+	 * @return
+	 */
+	public TimeBoundEventLocalityAnalyzer withMaxIntervalMax(long maxIntervalMax) {
+		this.maxIntervalMax = maxIntervalMax;
+		return this;
+	}
+	
 	@Override
 	public  void processFullWindow() {
-		Iterator<Boolean> iter = this.getIterator();
-		long i = 0;
+		Iterator<TimeStamped> iter = this.getIterator();
 		
 		//window positions for event occurences
 		List<Long> eventWindowPositions = new ArrayList<Long>();
 		while (iter.hasNext()) {
-			Boolean val = iter.next();
-			if (val) {
-				eventWindowPositions.add(i);
-				++i;
+			TimeStampedFlag val = (TimeStampedFlag)iter.next();
+			if (val.getFlag()) {
+				eventWindowPositions.add(val.getTimeStamp());
 			}
 		}
-		score = EventLoality.getScore(eventWindowPositions, minOccurence, maxIntervalAverage, maxIntervalMax, maxSize);
+		
+		score = EventLoality.getScore(eventWindowPositions, minOccurence, maxIntervalAverage, maxIntervalMax, size());
 	}
-
+	
 	/**
 	 * @return
 	 */
 	public double getScore() {
 		return score;
 	}
-	
 	
 }
