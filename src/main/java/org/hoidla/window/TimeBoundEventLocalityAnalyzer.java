@@ -31,10 +31,8 @@ import org.hoidla.util.TimeStampedFlag;
  *
  */
 public class TimeBoundEventLocalityAnalyzer extends TimeBoundWindow {
-	private int minOccurence = 1;
-	private long maxIntervalAverage = -1;
-	private long maxIntervalMax = -1;
 	private double score;
+	private EventLocality.Context context;
 
 	private static final long serialVersionUID = -7873039731214593449L;
 
@@ -42,50 +40,11 @@ public class TimeBoundEventLocalityAnalyzer extends TimeBoundWindow {
 	 * @param timeSpan
 	 * @param minOccurence
 	 */
-	public TimeBoundEventLocalityAnalyzer(long timeSpan, int minOccurence) {
+	public TimeBoundEventLocalityAnalyzer(long timeSpan, EventLocality.Context context) {
 		super(timeSpan);
-		this.minOccurence = minOccurence;
+		this.context = context;
 	}
-	
-	/**
-	 * @param timeSpan
-	 * @param timeStep
-	 * @param minOccurence
-	 */
-	public TimeBoundEventLocalityAnalyzer(long timeSpan, long timeStep, int minOccurence) {
-		super(timeSpan, timeStep);
-		this.minOccurence = minOccurence;
-	}
-	
-	/**
-	 * @param timeSpan
-	 * @param timeStep
-	 * @param processingTimeStep
-	 * @param minOccurence
-	 */
-	public TimeBoundEventLocalityAnalyzer(long timeSpan, long timeStep, long processingTimeStep, int minOccurence) {
-		super(timeSpan, timeStep, processingTimeStep);
-		this.minOccurence = minOccurence;
-	}
-	
-	/**
-	 * @param maxIntervalAverage
-	 * @return
-	 */
-	public TimeBoundEventLocalityAnalyzer withMaxIntervalAverage(long maxIntervalAverage) {
-		this.maxIntervalAverage = maxIntervalAverage;
-		return this;
-	}
-	
-	/**
-	 * @param maxIntervalMax
-	 * @return
-	 */
-	public TimeBoundEventLocalityAnalyzer withMaxIntervalMax(long maxIntervalMax) {
-		this.maxIntervalMax = maxIntervalMax;
-		return this;
-	}
-	
+
 	@Override
 	public  void processFullWindow() {
 		Iterator<TimeStamped> iter = this.getIterator();
@@ -98,8 +57,13 @@ public class TimeBoundEventLocalityAnalyzer extends TimeBoundWindow {
 				eventWindowPositions.add(val.getTimeStamp());
 			}
 		}
-		
-		score = EventLoality.getScore(eventWindowPositions, minOccurence, maxIntervalAverage, maxIntervalMax, size());
+
+		if (null != context.singleStatregies) {
+			score = EventLocality.geSingleScore(eventWindowPositions, context.minOccurence, context.maxIntervalAverage, 
+				context.maxIntervalMax, context.singleStatregies, size());
+		} else {
+			score =   EventLocality.geWeightedScore(eventWindowPositions, context.aggregateWeightedStrategies,  size());
+		}
 	}
 	
 	/**

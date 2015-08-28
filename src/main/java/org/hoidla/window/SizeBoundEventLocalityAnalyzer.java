@@ -27,50 +27,13 @@ import java.util.List;
  *
  */
 public class SizeBoundEventLocalityAnalyzer extends SizeBoundWindow<Boolean> {
-	private int minOccurence = 1;
-	private long maxIntervalAverage = -1;
-	private long maxIntervalMax = -1;
 	private double score = 0;
+	private EventLocality.Context context;
 	
-	/**
-	 * @param maxSize
-	 * @param minOccurence
-	 * @param maxIntervalAverage
-	 * @param maxIntervalMax
-	 */
-	public SizeBoundEventLocalityAnalyzer(int maxSize, int minOccurence,
-			long maxIntervalAverage, long maxIntervalMax) {
+	
+	public SizeBoundEventLocalityAnalyzer(int maxSize, EventLocality.Context context) {
 		super(maxSize);
-		this.minOccurence = minOccurence;
-		this.maxIntervalAverage = maxIntervalAverage;
-		this.maxIntervalMax = maxIntervalMax;
-	}
-	
-	/**
-	 * @param maxSize
-	 * @param minOccurence
-	 */
-	public SizeBoundEventLocalityAnalyzer(int maxSize, int minOccurence) {
-		super(maxSize);
-		this.minOccurence = minOccurence;
-	}
-	
-	/**
-	 * @param maxIntervalAverage
-	 * @return
-	 */
-	public SizeBoundEventLocalityAnalyzer withMaxIntervalAverage(long maxIntervalAverage) {
-		this.maxIntervalAverage = maxIntervalAverage;
-		return this;
-	}
-	
-	/**
-	 * @param maxIntervalMax
-	 * @return
-	 */
-	public SizeBoundEventLocalityAnalyzer withMaxIntervalMax(long maxIntervalMax) {
-		this.maxIntervalMax = maxIntervalMax;
-		return this;
+		this.context = context;
 	}
 
 	/* (non-Javadoc)
@@ -90,7 +53,13 @@ public class SizeBoundEventLocalityAnalyzer extends SizeBoundWindow<Boolean> {
 				++i;
 			}
 		}
-		score = EventLoality.getScore(eventWindowPositions, minOccurence, maxIntervalAverage, maxIntervalMax, maxSize);
+		
+		if (null != context.singleStatregies) {
+			score = EventLocality.geSingleScore(eventWindowPositions, context.minOccurence, context.maxIntervalAverage, 
+				context.maxIntervalMax, context.singleStatregies, maxSize);
+		} else {
+			score =   EventLocality.geWeightedScore(eventWindowPositions, context.aggregateWeightedStrategies, maxSize);
+		}
 	}
 
 	/**
