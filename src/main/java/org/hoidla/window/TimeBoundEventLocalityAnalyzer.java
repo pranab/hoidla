@@ -16,15 +16,14 @@
  */
 
 
-
 package org.hoidla.window;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import org.hoidla.util.ExplicitlyTimeStampedFlag;
 import org.hoidla.util.TimeStamped;
-import org.hoidla.util.TimeStampedFlag;
 
 /**
  * @author pranab
@@ -52,7 +51,7 @@ public class TimeBoundEventLocalityAnalyzer extends TimeBoundWindow {
 		//window positions for event occurences
 		List<Long> eventWindowPositions = new ArrayList<Long>();
 		while (iter.hasNext()) {
-			TimeStampedFlag val = (TimeStampedFlag)iter.next();
+			ExplicitlyTimeStampedFlag val = (ExplicitlyTimeStampedFlag)iter.next();
 			if (val.getFlag()) {
 				eventWindowPositions.add(val.getTimeStamp());
 			}

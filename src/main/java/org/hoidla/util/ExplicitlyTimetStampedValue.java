@@ -15,34 +15,31 @@
  * permissions and limitations under the License.
  */
 
-
 package org.hoidla.util;
 
 /**
- * Time stamped flag
  * @author pranab
  *
+ * @param <T>
  */
-public class TimeStampedFlag implements TimeStamped {
-	private boolean flag;
-	private long timeStamp;
+public class ExplicitlyTimetStampedValue<T>  extends ExplicitlyTimeStampedFlag {
+	private T value;
+	
+	/**
+	 * @param value
+	 * @param timeStamp
+	 */
+	public ExplicitlyTimetStampedValue(T value, long timeStamp, boolean flag) {
+		super(timeStamp,  flag);
+		this.value = value;
+	}
 
-	public TimeStampedFlag(boolean flag) {
-		this.flag = flag;
-		this.timeStamp = System.currentTimeMillis();
+	/**
+	 * @return
+	 */
+	public T getValue() {
+		return value;
 	}
 	
-	public TimeStampedFlag(boolean flag, long timeStamp) {
-		this.flag = flag;
-		this.timeStamp = timeStamp;
-	}
 
-	@Override
-	public long getTimeStamp() {
-		return timeStamp;
-	}
-
-	public boolean getFlag() {
-		return flag;
-	}
 }
