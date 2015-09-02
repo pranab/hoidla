@@ -97,7 +97,7 @@ public class Criteria implements Serializable {
 		} else if (expression.contains(OPERATOR_OR)) {
 			predicateText = expression.split(OPERATOR_OR);
 		} else {
-			//simple onr predicate
+			//simple one  predicate
 		}
 		
 		if (null  != predicateText) {
@@ -110,7 +110,6 @@ public class Criteria implements Serializable {
 			Predicate pred = createPredicateFromExpression(expression);
 			criteria.withPredicate(pred);
 		}
-		
 		return criteria;
 	}
 	
@@ -122,6 +121,26 @@ public class Criteria implements Serializable {
 		String[] predParts = expression.split("\\s+");
 		Predicate pred = new Predicate(predParts[0], predParts[1], Double.parseDouble( predParts[2]));
 		return pred;
+	}
+	
+	/**
+	 * @return
+	 */
+	public boolean evaluate(double[] operandValues) {
+		boolean result = true;
+		for (int i = 0; i < predicates.size();  ++i) {
+			if (i == 0) {
+				result = predicates.get(i).evaluate(operandValues[i]);
+			} else {
+				if (operators.get(i-1).equals(OPERATOR_AND)) {
+					result = result && predicates.get(i).evaluate(operandValues[i]);
+				} else {
+					result = result ||  predicates.get(i).evaluate(operandValues[i]);
+				}
+			}
+		}
+		
+		return result;
 	}
 	
 	/**
