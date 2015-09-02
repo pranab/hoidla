@@ -83,6 +83,48 @@ public class Criteria implements Serializable {
 	}
 
 	/**
+	 * creates simple criteria consisting of two predicated connected AND or OR
+	 * @param expression
+	 * @return
+	 */
+	public static Criteria createCriteriaFromExpression(String expression) {
+		Criteria criteria = new Criteria();
+		String[] predicateText = null;
+		boolean withAnd = false;
+		if (expression.contains(OPERATOR_AND)) {
+			predicateText = expression.split(OPERATOR_AND);
+			withAnd = true;
+		} else if (expression.contains(OPERATOR_OR)) {
+			predicateText = expression.split(OPERATOR_OR);
+		} else {
+			//simple onr predicate
+		}
+		
+		if (null  != predicateText) {
+			Predicate predOne = createPredicateFromExpression(predicateText[0]);
+			criteria.withPredicate(predOne);
+			criteria = withAnd ? criteria.withAnd() : criteria.withOr();
+			Predicate predTwo = createPredicateFromExpression(predicateText[1]);
+			criteria.withPredicate(predTwo);
+		} else {
+			Predicate pred = createPredicateFromExpression(expression);
+			criteria.withPredicate(pred);
+		}
+		
+		return criteria;
+	}
+	
+	/**
+	 * @param expression
+	 * @return
+	 */
+	public static  Predicate createPredicateFromExpression(String expression) {
+		String[] predParts = expression.split("\\s+");
+		Predicate pred = new Predicate(predParts[0], predParts[1], Double.parseDouble( predParts[2]));
+		return pred;
+	}
+	
+	/**
 	 * @param window
 	 * @return
 	 */
