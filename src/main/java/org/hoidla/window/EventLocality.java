@@ -158,6 +158,31 @@ public class EventLocality {
 		public List<String> singleStatregies;
 		public Map<String,Double> aggregateWeightedStrategies;
 		
+		
+		/**
+		 * @param minOccurence
+		 * @param maxIntervalAverage
+		 * @param maxIntervalMax
+		 * @param singleStatregies
+		 */
+		public Context(int minOccurence, long maxIntervalAverage, long maxIntervalMax, List<String> singleStatregies) {
+			super();
+			this.minOccurence = minOccurence;
+			this.maxIntervalAverage = maxIntervalAverage;
+			this.maxIntervalMax = maxIntervalMax;
+			this.singleStatregies = singleStatregies;
+		}
+
+		
+		/**
+		 * @param aggregateWeightedStrategies
+		 */
+		public Context(Map<String, Double> aggregateWeightedStrategies) {
+			super();
+			this.aggregateWeightedStrategies = aggregateWeightedStrategies;
+		}
+
+
 		/**
 		 * @param strategyList
 		 */

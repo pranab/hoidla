@@ -39,8 +39,8 @@ public class TimeBoundEventLocalityAnalyzer extends TimeBoundWindow {
 	 * @param timeSpan
 	 * @param minOccurence
 	 */
-	public TimeBoundEventLocalityAnalyzer(long timeSpan, EventLocality.Context context) {
-		super(timeSpan);
+	public TimeBoundEventLocalityAnalyzer(long timeSpan, long timeStep, EventLocality.Context context) {
+		super(timeSpan, timeStep);
 		this.context = context;
 	}
 
