@@ -124,6 +124,7 @@ public class Criteria implements Serializable {
 	}
 	
 	/**
+	 * evaluates simple criteria
 	 * @return
 	 */
 	public boolean evaluate(double[] operandValues) {
@@ -254,5 +255,9 @@ public class Criteria implements Serializable {
 		}
 		
 		return opValue;
+	}
+	
+	public int getNumPredicates() {
+		return predicates.size();
 	}
 }
