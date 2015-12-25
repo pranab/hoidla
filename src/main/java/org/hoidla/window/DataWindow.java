@@ -29,7 +29,7 @@ import java.util.LinkedList;
  * @param <T>
  */
 public abstract class DataWindow<T> {
-	protected AbstractList<T> dataWindow = null;
+	protected AbstractList<T> dataWindow =  new ArrayList<T>();
 	protected long count;
 	protected boolean expired;
 	
