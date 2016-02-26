@@ -30,6 +30,7 @@ import java.util.Map;
 public class EventLocality {
 	
 	/**
+	 * Finds event locality score based in various strategies for positional event
 	 * @param eventWindowPositions
 	 * @param minOccurence
 	 * @param maxIntervalAverage
@@ -38,7 +39,7 @@ public class EventLocality {
 	 * @param windowSize
 	 * @return
 	 */
-	public static double geSingleScore(List<Long> eventWindowPositions, int minOccurence, long maxIntervalAverage,
+	public static double getPositionalEventSingleScore(List<Long> eventWindowPositions, int minOccurence, long maxIntervalAverage,
 			long maxIntervalMax, List<String> strategies, int windowSize) {
 		double score = 0;
 		boolean scoreSet = false;
@@ -94,7 +95,8 @@ public class EventLocality {
 	 * @param windowSize
 	 * @return
 	 */
-	public static double geWeightedScore(List<Long> eventWindowPositions, Map<String,Double> strategies, int windowSize) {
+	public static double getPositionalWeightedScore(List<Long> eventWindowPositions, Map<String,Double> strategies, 
+			int windowSize) {
 		double score = 0;
 		double weightedScore = 0;
 		double weightSum = 0;
@@ -145,6 +147,68 @@ public class EventLocality {
 			throw new IllegalArgumentException("no valid temporal locality strategy found");
 		}
 		return weightedScore / weightSum ;
+	}
+
+	/**
+	 * Finds event locality score based in various strategies for positional event
+	 * @param eventWindowTimes
+	 * @param minOccurenceTimeSpan
+	 * @param maxTimeIntervalAverage
+	 * @param maxTimeIntervalMax
+	 * @param strategies
+	 * @param windowTimeSpan
+	 * @return
+	 */
+	public static double getTimedEventSingleScore(List<Long> eventWindowTimes, int minOccurenceTimeSpan, 
+			long maxTimeIntervalAverage,long maxTimeIntervalMax, List<String> strategies, long windowTimeSpan) {
+		double score = 0;
+		boolean scoreSet = false;
+		
+		//try all strategies and quit after the first one that meets condition
+		for (String strategy : strategies) {
+			if (strategy.equals("numOcuurence")) {
+				long span = eventWindowTimes.get(eventWindowTimes.size() - 1) - eventWindowTimes.get(0); 
+				if (span > minOccurenceTimeSpan) {
+					score = 1.0;
+					scoreSet = true;
+				} 
+			} else if (strategy.equals("averageInterval")) {
+				double avInterval = 0;
+				for (int j = 0; j < eventWindowTimes.size() - 1; ++j) 	{
+					avInterval += (double)(eventWindowTimes.get(j+1) - eventWindowTimes.get(j));
+				}
+				avInterval /= (eventWindowTimes.size() - 1);
+				if (avInterval <  maxTimeIntervalAverage) {
+					score = 1.0;
+					scoreSet = true;
+				}
+			} else if (strategy.equals("maxInterval")) {
+				long maxInterval = 0;
+				for (int j = 0; j < eventWindowTimes.size() - 1; ++j) 	{
+					long interval = eventWindowTimes.get(j+1) - eventWindowTimes.get(j);
+					if (interval > maxInterval) {
+						maxInterval = interval;
+					}
+				}
+				if (maxInterval <  maxTimeIntervalMax) {
+					score = 1.0;
+					scoreSet = true;
+				}
+			} else {
+				throw new IllegalArgumentException("invalid temporal locality strategy");
+			}
+			if (scoreSet) {
+				break;
+			}
+		}
+		
+		//default score
+		if (!scoreSet) {
+			long span = eventWindowTimes.get(eventWindowTimes.size() - 1) - eventWindowTimes.get(0); 
+			score = (double)eventWindowTimes.size() / windowTimeSpan;
+		}
+
+		return score;
 	}
 	
 	/**
