@@ -50,7 +50,24 @@ public class TemporalClusterFinder {
 	 */
 	public List<TemporalCluster> findClusters() {
 		List<TemporalCluster> clusters = new ArrayList<TemporalCluster>();
-		
+		boolean first = true;
+		TemporalCluster cluster = new TemporalCluster();
+		for (long evTime : eventTimes) {
+			if (first) {
+				cluster.setStartFound(evTime - timeHorizonStart > minSeparation);
+				cluster.add(evTime);
+				first = false;
+			} else {
+				if (evTime - cluster.getEndTime() > minSeparation) {
+					//start new cluster
+					cluster.setEndFound(true);
+					clusters.add(cluster);
+					cluster = new TemporalCluster();
+					cluster.setStartFound(true);
+				}
+				cluster.add(evTime);
+			}
+		}
 		return clusters;
 	}
 	

@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
+ * Cluster of temporal sequence data
  * @author pranab
  *
  */
@@ -50,11 +51,11 @@ public class TemporalCluster {
 		this.endFound = endFound;
 	}
 	
-	public long getStartPoint() {
+	public long getStartTime() {
 		return eventTimes.get(0);
 	}
 	
-	public long getEndPoint() {
+	public long getEndTime() {
 		return eventTimes.get(eventTimes.size() - 1);
 	}
 	
