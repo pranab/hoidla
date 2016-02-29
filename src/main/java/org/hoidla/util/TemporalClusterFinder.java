@@ -30,7 +30,21 @@ public class TemporalClusterFinder {
 	private long timeHorizonEnd;
 	private long minSeparation;
 	
+	public TemporalClusterFinder() {
+	}
 	
+	/**
+	 * @param timeHorizonStart
+	 * @param timeHorizonEnd
+	 * @param minSeparation
+	 */
+	public TemporalClusterFinder(long timeHorizonStart, long timeHorizonEnd,
+			long minSeparation) {
+		this.timeHorizonStart = timeHorizonStart;
+		this.timeHorizonEnd = timeHorizonEnd;
+		this.minSeparation = minSeparation;
+	}
+
 	/**
 	 * @param eventTimes
 	 * @param timeHorizonStart
@@ -45,6 +59,16 @@ public class TemporalClusterFinder {
 		this.minSeparation = minSeparation;
 	}
 	
+	/**
+	 * @param eventTimes
+	 * @param timeHorizonStart
+	 * @param timeHorizonEnd
+	 * @param minSeparation
+	 */
+	public void initialize(List<Long> eventTimes) {
+		this.eventTimes = eventTimes;
+	}
+
 	/**
 	 * @return
 	 */
