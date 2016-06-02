@@ -117,7 +117,7 @@ public class EventLocality {
 			avInterval /= (eventWindowPositions.size() - 1);
 			score = 1.0 - 1.0 / avInterval;
 			weightedScore += score * strategies.get("averageInterval");
-			weightSum = strategies.get("averageInterval");
+			weightSum += strategies.get("averageInterval");
 			found = true;
 		}		
 		
@@ -210,6 +210,67 @@ public class EventLocality {
 
 		return score;
 	}
+	
+	/**
+	 * @param eventWindowTimes
+	 * @param minOccurenceTimeSpan
+	 * @param maxTimeIntervalAverage
+	 * @param maxTimeIntervalMax
+	 * @param strategies
+	 * @param windowTimeSpan
+	 * @return
+	 */
+	public static double getTimedEventWeightedScore(List<Long> eventWindowTimes, int minOccurenceTimeSpan, 
+			long maxTimeIntervalAverage,long maxTimeIntervalMax, Map<String,Double> strategies, long windowTimeSpan) {
+		double score = 0;
+		double weightedScore = 0;
+		double weightSum = 0;
+		boolean found = false;
+		
+		if (strategies.containsKey("numOcuurence")) {
+			long span = eventWindowTimes.get(eventWindowTimes.size() - 1) - eventWindowTimes.get(0); 
+			if (span > minOccurenceTimeSpan) {
+				score = 1.0;
+				weightedScore = score * strategies.get("numOcuurence");
+				weightSum = strategies.get("numOcuurence");
+				found = true;
+			} 
+		}
+		if (strategies.containsKey("averageInterval")) {
+			double avInterval = 0;
+			for (int j = 0; j < eventWindowTimes.size() - 1; ++j) 	{
+				avInterval += (double)(eventWindowTimes.get(j+1) - eventWindowTimes.get(j));
+			}
+			avInterval /= (eventWindowTimes.size() - 1);
+			if (avInterval <  maxTimeIntervalAverage) {
+				score = 1.0;
+				weightedScore += score * strategies.get("averageInterval");
+				weightSum += strategies.get("averageInterval");
+				found = true;
+			}
+		}	
+		if (strategies.containsKey("maxInterval")) {
+			long maxInterval = 0;
+			for (int j = 0; j < eventWindowTimes.size() - 1; ++j) 	{
+				long interval = eventWindowTimes.get(j+1) - eventWindowTimes.get(j);
+				if (interval > maxInterval) {
+					maxInterval = interval;
+				}
+			}
+			if (maxInterval <  maxTimeIntervalMax) {
+				score = 1.0;
+				weightedScore += score * strategies.get("maxInterval");
+				weightSum += strategies.get("maxInterval");
+				found = true;
+			}
+			
+		}		
+
+		if (!found) {
+			throw new IllegalArgumentException("no valid temporal locality strategy found");
+		}
+		return weightedScore / weightSum ;
+	}	
 	
 	/**
 	 * @author pranab

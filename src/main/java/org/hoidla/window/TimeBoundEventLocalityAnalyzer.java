@@ -58,10 +58,11 @@ public class TimeBoundEventLocalityAnalyzer extends TimeBoundWindow {
 		}
 
 		if (null != context.singleStatregies) {
-			score = EventLocality.geSingleScore(eventWindowPositions, context.minOccurence, context.maxIntervalAverage, 
+			score = EventLocality.getTimedEventSingleScore(eventWindowPositions, context.minOccurence, context.maxIntervalAverage, 
 				context.maxIntervalMax, context.singleStatregies, size());
 		} else {
-			score =   EventLocality.geWeightedScore(eventWindowPositions, context.aggregateWeightedStrategies,  size());
+			score =   EventLocality.getTimedEventWeightedScore(eventWindowPositions, context.minOccurence, context.maxIntervalAverage, 
+					context.maxIntervalMax, context.aggregateWeightedStrategies,  size());
 		}
 	}
 	
