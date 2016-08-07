@@ -55,10 +55,13 @@ public class SizeBoundEventLocalityAnalyzer extends SizeBoundWindow<Boolean> {
 		}
 		
 		if (null != context.singleStatregies) {
-			score = EventLocality.getPositionalEventSingleScore(eventWindowPositions, context.minOccurence, context.maxIntervalAverage, 
-				context.maxIntervalMax, context.singleStatregies, maxSize);
+			score = EventLocality.getPositionalEventSingleScore(eventWindowPositions, context.minOccurence, 
+					context.maxIntervalAverage, context.maxIntervalMax, context.minRangeLength,  
+					context.singleStatregies, maxSize);
 		} else {
-			score =   EventLocality.getPositionalWeightedScore(eventWindowPositions, context.aggregateWeightedStrategies, maxSize);
+			score =   EventLocality.getPositionalWeightedScore(eventWindowPositions, context.minOccurence, 
+					context.maxIntervalAverage, context.maxIntervalMax, context.minRangeLength, 
+					context.aggregateWeightedStrategies, maxSize);
 		}
 	}
 

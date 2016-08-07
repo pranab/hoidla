@@ -39,8 +39,8 @@ public class EventLocality {
 	 * @param windowSize
 	 * @return
 	 */
-	public static double getPositionalEventSingleScore(List<Long> eventWindowPositions, int minOccurence, long maxIntervalAverage,
-			long maxIntervalMax, List<String> strategies, int windowSize) {
+	public static double getPositionalEventSingleScore(List<Long> eventWindowPositions, int minOccurence, 
+			long maxIntervalAverage,long maxIntervalMax, long minRangeLength, List<String> strategies, int windowSize) {
 		double score = 0;
 		boolean scoreSet = false;
 		
@@ -73,19 +73,22 @@ public class EventLocality {
 					score = 1.0;
 					scoreSet = true;
 				}
-			} else {
+			} else if (strategy.equals("rangeOccurence")) {
+				long range  = findContguousOccurence(eventWindowPositions);
+				if (range > minRangeLength) {
+					score = 1.0;
+					scoreSet = true;
+				}
+			}
+			else {
 				throw new IllegalArgumentException("invalid temporal locality strategy");
 			}
+			
 			if (scoreSet) {
 				break;
 			}
 		}
 		
-		//default score
-		if (!scoreSet) {
-			score = (double)eventWindowPositions.size() / windowSize;
-		}
-
 		return score;
 	}
 	
@@ -95,7 +98,8 @@ public class EventLocality {
 	 * @param windowSize
 	 * @return
 	 */
-	public static double getPositionalWeightedScore(List<Long> eventWindowPositions, Map<String,Double> strategies, 
+	public static double getPositionalWeightedScore(List<Long> eventWindowPositions, int minOccurence, 
+			long maxIntervalAverage,long maxIntervalMax, long minRangeLength, Map<String,Double> strategies, 
 			int windowSize) {
 		double score = 0;
 		double weightedScore = 0;
@@ -103,7 +107,11 @@ public class EventLocality {
 		boolean found = false;
 		
 		if (strategies.containsKey("numOcuurence")) {
-			score = ((double)eventWindowPositions.size()) / windowSize;
+			score = 0;
+			if (eventWindowPositions.size() > minOccurence) {
+				score = 1.0;
+			} 
+
 			weightedScore = score * strategies.get("numOcuurence");
 			weightSum = strategies.get("numOcuurence");
 			found = true;
@@ -115,7 +123,11 @@ public class EventLocality {
 				avInterval += (double)(eventWindowPositions.get(j+1) - eventWindowPositions.get(j));
 			}
 			avInterval /= (eventWindowPositions.size() - 1);
-			score = 1.0 - 1.0 / avInterval;
+			score = 0;
+			if (avInterval <  maxIntervalAverage) {
+				score = 1.0;				
+			}
+
 			weightedScore += score * strategies.get("averageInterval");
 			weightSum += strategies.get("averageInterval");
 			found = true;
@@ -129,15 +141,22 @@ public class EventLocality {
 					maxInterval = interval;
 				}
 			}
-			score = 1.0 - 1.0 / maxInterval;
+			score = 0;
+			if (maxInterval <  maxIntervalMax) {
+				score = 1.0;
+			}
+
 			weightedScore += score * strategies.get("maxInterval");
 			weightSum = strategies.get("maxInterval");
 			found = true;
 		}		
 		
 		if (strategies.containsKey("rangeOccurence")) {
-			long range  = eventWindowPositions.get(eventWindowPositions.size() - 1)  - eventWindowPositions.get(0);
-			score = 1.0 -  ((double)range) / windowSize;
+			long range  = findContguousOccurence(eventWindowPositions);
+			score = 0;
+			if (range > minRangeLength) {
+				score = 1.0;
+			}
 			weightedScore += score * strategies.get("rangeOccurence");
 			weightSum = strategies.get("rangeOccurence");
 			found = true;
@@ -149,6 +168,28 @@ public class EventLocality {
 		return weightedScore / weightSum ;
 	}
 
+	/**
+	 * @param eventWindowPositions
+	 * @return
+	 */
+	private static int findContguousOccurence(List<Long> eventWindowPositions) {
+		int range = 1;
+		int maxRange = 1;
+		long prevPos  = eventWindowPositions.get(0);
+		for (int i = 1; i < eventWindowPositions.size(); ++i) {
+			if (eventWindowPositions.get(i) == prevPos) {
+				++range;
+			} else {
+				if (range > maxRange){
+					maxRange = range;
+				}
+				range = 1;
+			}
+			prevPos = eventWindowPositions.get(i);
+		}
+		return maxRange;
+	}
+	
 	/**
 	 * Finds event locality score based in various strategies for positional event
 	 * @param eventWindowTimes
@@ -202,12 +243,6 @@ public class EventLocality {
 			}
 		}
 		
-		//default score
-		if (!scoreSet) {
-			long span = eventWindowTimes.get(eventWindowTimes.size() - 1) - eventWindowTimes.get(0); 
-			score = (double)eventWindowTimes.size() / windowTimeSpan;
-		}
-
 		return score;
 	}
 	
@@ -226,17 +261,20 @@ public class EventLocality {
 		double weightedScore = 0;
 		double weightSum = 0;
 		boolean found = false;
+		boolean scoreSet = false;
 		
 		if (strategies.containsKey("numOcuurence")) {
+			found = true;
 			long span = eventWindowTimes.get(eventWindowTimes.size() - 1) - eventWindowTimes.get(0); 
 			if (span > minOccurenceTimeSpan) {
 				score = 1.0;
 				weightedScore = score * strategies.get("numOcuurence");
 				weightSum = strategies.get("numOcuurence");
-				found = true;
+				scoreSet = true;
 			} 
 		}
 		if (strategies.containsKey("averageInterval")) {
+			found = true;
 			double avInterval = 0;
 			for (int j = 0; j < eventWindowTimes.size() - 1; ++j) 	{
 				avInterval += (double)(eventWindowTimes.get(j+1) - eventWindowTimes.get(j));
@@ -246,10 +284,11 @@ public class EventLocality {
 				score = 1.0;
 				weightedScore += score * strategies.get("averageInterval");
 				weightSum += strategies.get("averageInterval");
-				found = true;
+				scoreSet = true;
 			}
 		}	
 		if (strategies.containsKey("maxInterval")) {
+			found = true;
 			long maxInterval = 0;
 			for (int j = 0; j < eventWindowTimes.size() - 1; ++j) 	{
 				long interval = eventWindowTimes.get(j+1) - eventWindowTimes.get(j);
@@ -261,7 +300,7 @@ public class EventLocality {
 				score = 1.0;
 				weightedScore += score * strategies.get("maxInterval");
 				weightSum += strategies.get("maxInterval");
-				found = true;
+				scoreSet = true;
 			}
 			
 		}		
@@ -269,7 +308,12 @@ public class EventLocality {
 		if (!found) {
 			throw new IllegalArgumentException("no valid temporal locality strategy found");
 		}
-		return weightedScore / weightSum ;
+		
+		double finalScore = 0;
+		if (scoreSet) {
+			finalScore = weightedScore / weightSum;
+		}
+		return finalScore;
 	}	
 	
 	/**
@@ -280,6 +324,7 @@ public class EventLocality {
 		public int minOccurence = 1;
 		public long maxIntervalAverage = -1;
 		public long maxIntervalMax = -1;
+		public long minRangeLength = -1;
 		public List<String> singleStatregies;
 		public Map<String,Double> aggregateWeightedStrategies;
 		
@@ -290,11 +335,13 @@ public class EventLocality {
 		 * @param maxIntervalMax
 		 * @param singleStatregies
 		 */
-		public Context(int minOccurence, long maxIntervalAverage, long maxIntervalMax, List<String> singleStatregies) {
+		public Context(int minOccurence, long maxIntervalAverage, long maxIntervalMax, long minRangeLength, 
+				List<String> singleStatregies) {
 			super();
 			this.minOccurence = minOccurence;
 			this.maxIntervalAverage = maxIntervalAverage;
 			this.maxIntervalMax = maxIntervalMax;
+			this.minRangeLength = minRangeLength;
 			this.singleStatregies = singleStatregies;
 		}
 

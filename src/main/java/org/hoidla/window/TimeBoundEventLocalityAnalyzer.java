@@ -30,7 +30,7 @@ import org.hoidla.util.TimeStamped;
  *
  */
 public class TimeBoundEventLocalityAnalyzer extends TimeBoundWindow {
-	private double score;
+	private double score = -1.0;
 	private EventLocality.Context context;
 
 	private static final long serialVersionUID = -7873039731214593449L;

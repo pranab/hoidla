@@ -2,5 +2,10 @@ target/**/*
 .settings/
 .project
 .classpath
+.history
+.DS_Store
+.cache
+.class
+.ivy2
 
 /target

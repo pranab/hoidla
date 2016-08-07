@@ -18,6 +18,10 @@
 
 package org.hoidla.util;
 
+/**
+ * @author pranab
+ *
+ */
 public class ExplicitlyTimeStampedFlag implements TimeStamped {
 	private boolean flag;
 	private long timeStamp;
@@ -25,6 +29,10 @@ public class ExplicitlyTimeStampedFlag implements TimeStamped {
 	public ExplicitlyTimeStampedFlag( long timeStamp, boolean flag) {
 		this.flag = flag;
 		this.timeStamp = timeStamp;
+	}
+	
+	public ExplicitlyTimeStampedFlag( long timeStamp) {
+		this(timeStamp, true);
 	}
 	
 	@Override
