@@ -40,9 +40,11 @@ public class EventLocality {
 	 * @return
 	 */
 	public static double getPositionalEventSingleScore(List<Long> eventWindowPositions, int minOccurence, 
-			long maxIntervalAverage,long maxIntervalMax, long minRangeLength, List<String> strategies, int windowSize) {
+			long maxIntervalAverage,long maxIntervalMax, long minRangeLength, List<String> strategies, 
+			int windowSize, boolean anyCond) {
 		double score = 0;
 		boolean scoreSet = false;
+		Map<String, Double> scores = new HashMap<String, Double>();
 		
 		//try all strategies and quit after the first one that meets condition
 		for (String strategy : strategies) {
@@ -50,6 +52,9 @@ public class EventLocality {
 				if (eventWindowPositions.size() > minOccurence) {
 					score = 1.0;
 					scoreSet = true;
+					if (!anyCond) {
+						scores.put("numOcuurence", score);
+					}
 				} 
 			} else if (strategy.equals("averageInterval")) {
 				double avInterval = 0;
@@ -60,6 +65,9 @@ public class EventLocality {
 				if (avInterval <  maxIntervalAverage) {
 					score = 1.0;
 					scoreSet = true;
+					if (!anyCond) {
+						scores.put("averageInterval", score);
+					}
 				}
 			} else if (strategy.equals("maxInterval")) {
 				long maxInterval = 0;
@@ -72,20 +80,36 @@ public class EventLocality {
 				if (maxInterval <  maxIntervalMax) {
 					score = 1.0;
 					scoreSet = true;
+					if (!anyCond) {
+						scores.put("maxInterval", score);
+					}
 				}
 			} else if (strategy.equals("rangeOccurence")) {
 				long range  = findContguousOccurence(eventWindowPositions);
 				if (range > minRangeLength) {
 					score = 1.0;
 					scoreSet = true;
+					if (!anyCond) {
+						scores.put("rangeOccurence", score);
+					}
 				}
 			}
 			else {
 				throw new IllegalArgumentException("invalid temporal locality strategy");
 			}
 			
-			if (scoreSet) {
+			if (anyCond && scoreSet) {
 				break;
+			}
+		}
+		
+		//or conditions
+		if (!anyCond) {
+			for (String strategy : strategies) {
+				if (null == scores.get(strategy)) {
+					score = 0;
+					break;
+				}
 			}
 		}
 		
@@ -201,9 +225,11 @@ public class EventLocality {
 	 * @return
 	 */
 	public static double getTimedEventSingleScore(List<Long> eventWindowTimes, int minOccurenceTimeSpan, 
-			long maxTimeIntervalAverage,long maxTimeIntervalMax, List<String> strategies, long windowTimeSpan) {
+			long maxTimeIntervalAverage,long maxTimeIntervalMax, List<String> strategies, long windowTimeSpan,
+			boolean anyCond) {
 		double score = 0;
 		boolean scoreSet = false;
+		Map<String, Double> scores = new HashMap<String, Double>();
 		
 		//try all strategies and quit after the first one that meets condition
 		for (String strategy : strategies) {
@@ -212,6 +238,9 @@ public class EventLocality {
 				if (span > minOccurenceTimeSpan) {
 					score = 1.0;
 					scoreSet = true;
+					if (!anyCond) {
+						scores.put("numOcuurence", score);
+					}
 				} 
 			} else if (strategy.equals("averageInterval")) {
 				double avInterval = 0;
@@ -222,6 +251,9 @@ public class EventLocality {
 				if (avInterval <  maxTimeIntervalAverage) {
 					score = 1.0;
 					scoreSet = true;
+					if (!anyCond) {
+						scores.put("averageInterval", score);
+					}
 				}
 			} else if (strategy.equals("maxInterval")) {
 				long maxInterval = 0;
@@ -234,12 +266,26 @@ public class EventLocality {
 				if (maxInterval <  maxTimeIntervalMax) {
 					score = 1.0;
 					scoreSet = true;
+					if (!anyCond) {
+						scores.put("maxInterval", score);
+					}
 				}
 			} else {
 				throw new IllegalArgumentException("invalid temporal locality strategy");
 			}
-			if (scoreSet) {
+			
+			if (anyCond && scoreSet) {
 				break;
+			}
+		}
+
+		//or conditions
+		if (!anyCond) {
+			for (String strategy : strategies) {
+				if (null == scores.get(strategy)) {
+					score = 0;
+					break;
+				}
 			}
 		}
 		
@@ -327,6 +373,7 @@ public class EventLocality {
 		public long minRangeLength = -1;
 		public List<String> singleStatregies;
 		public Map<String,Double> aggregateWeightedStrategies;
+		public boolean anyCond;
 		
 		
 		/**
@@ -336,13 +383,14 @@ public class EventLocality {
 		 * @param singleStatregies
 		 */
 		public Context(int minOccurence, long maxIntervalAverage, long maxIntervalMax, long minRangeLength, 
-				List<String> singleStatregies) {
+				List<String> singleStatregies, boolean anyCond) {
 			super();
 			this.minOccurence = minOccurence;
 			this.maxIntervalAverage = maxIntervalAverage;
 			this.maxIntervalMax = maxIntervalMax;
 			this.minRangeLength = minRangeLength;
 			this.singleStatregies = singleStatregies;
+			this.anyCond = anyCond;
 		}
 
 		

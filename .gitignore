@@ -7,5 +7,5 @@ target/**/*
 .cache
 .class
 .ivy2
-
+project/
 /target
