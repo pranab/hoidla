@@ -29,6 +29,8 @@ import java.util.Map;
  */
 public class EventLocality {
 	
+	private static double EVENT_PRESENCE_SCORE = 0.5;
+	
 	/**
 	 * Finds event locality score based in various strategies for positional event
 	 * @param eventWindowPositions
@@ -227,7 +229,7 @@ public class EventLocality {
 	public static double getTimedEventSingleScore(List<Long> eventWindowTimes, int minOccurenceTimeSpan, 
 			long maxTimeIntervalAverage,long maxTimeIntervalMax, List<String> strategies, long windowTimeSpan,
 			boolean anyCond) {
-		double score = 0;
+		double score = EVENT_PRESENCE_SCORE;
 		boolean scoreSet = false;
 		Map<String, Double> scores = new HashMap<String, Double>();
 		
@@ -283,7 +285,7 @@ public class EventLocality {
 		if (!anyCond) {
 			for (String strategy : strategies) {
 				if (null == scores.get(strategy)) {
-					score = 0;
+					score = EVENT_PRESENCE_SCORE;
 					break;
 				}
 			}
@@ -303,7 +305,7 @@ public class EventLocality {
 	 */
 	public static double getTimedEventWeightedScore(List<Long> eventWindowTimes, int minOccurenceTimeSpan, 
 			long maxTimeIntervalAverage,long maxTimeIntervalMax, Map<String,Double> strategies, long windowTimeSpan) {
-		double score = 0;
+		double score = EVENT_PRESENCE_SCORE;
 		double weightedScore = 0;
 		double weightSum = 0;
 		boolean found = false;

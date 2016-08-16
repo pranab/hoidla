@@ -32,6 +32,11 @@ import org.hoidla.util.TimeStamped;
 public class TimeBoundEventLocalityAnalyzer extends TimeBoundWindow {
 	private double score = -1.0;
 	private EventLocality.Context context;
+	private long lastTriggerTime = 0;
+	private boolean inCluster = false;
+	private long minEventTimeInterval;
+	private double scoreThreshold;
+	private boolean triggered;
 
 	private static final long serialVersionUID = -7873039731214593449L;
 
@@ -39,13 +44,17 @@ public class TimeBoundEventLocalityAnalyzer extends TimeBoundWindow {
 	 * @param timeSpan
 	 * @param minOccurence
 	 */
-	public TimeBoundEventLocalityAnalyzer(long timeSpan, long timeStep, EventLocality.Context context) {
+	public TimeBoundEventLocalityAnalyzer(long timeSpan, long timeStep, long minEventTimeInterval, 
+			double scoreThreshold, EventLocality.Context context) {
 		super(timeSpan, timeStep);
 		this.context = context;
+		this.scoreThreshold = scoreThreshold;
+		this.minEventTimeInterval = minEventTimeInterval;
 	}
 
 	@Override
 	public  void processFullWindow() {
+		triggered = false;
 		Iterator<TimeStamped> iter = this.getIterator();
 		
 		//window positions for event occurences
@@ -64,13 +73,42 @@ public class TimeBoundEventLocalityAnalyzer extends TimeBoundWindow {
 			score =   EventLocality.getTimedEventWeightedScore(eventWindowPositions, context.minOccurence, context.maxIntervalAverage, 
 					context.maxIntervalMax, context.aggregateWeightedStrategies,  size());
 		}
+		
+		//should we trigger
+		TimeStamped latest = getLatest();
+		if (inCluster) {
+			if (score > scoreThreshold) {
+				triggered = true;
+				lastTriggerTime = latest.getTimeStamp();
+			} else {
+				//cluster is ending 
+				inCluster = false;
+			}
+		} else {
+			if (score > 0) {
+				//cluster is starting
+				if (lastTriggerTime == 0 || 
+						(latest.getTimeStamp() - lastTriggerTime) > minEventTimeInterval) {
+					//should always trigger when cluster is forming
+					triggered = true;
+					lastTriggerTime = latest.getTimeStamp();
+				}
+				inCluster = true;
+			}
+		}
+		
 	}
+	
 	
 	/**
 	 * @return
 	 */
 	public double getScore() {
 		return score;
+	}
+
+	public boolean isTriggered() {
+		return triggered;
 	}
 	
 }
