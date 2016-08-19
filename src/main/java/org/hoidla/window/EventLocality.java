@@ -30,6 +30,7 @@ import java.util.Map;
 public class EventLocality {
 	
 	private static double EVENT_PRESENCE_SCORE = 0.5;
+	private static double CLUSTER_PRESENCE_SCORE = 1.0;
 	
 	/**
 	 * Finds event locality score based in various strategies for positional event
@@ -44,7 +45,7 @@ public class EventLocality {
 	public static double getPositionalEventSingleScore(List<Long> eventWindowPositions, int minOccurence, 
 			long maxIntervalAverage,long maxIntervalMax, long minRangeLength, List<String> strategies, 
 			int windowSize, boolean anyCond) {
-		double score = 0;
+		double score = EVENT_PRESENCE_SCORE;
 		boolean scoreSet = false;
 		Map<String, Double> scores = new HashMap<String, Double>();
 		
@@ -52,7 +53,7 @@ public class EventLocality {
 		for (String strategy : strategies) {
 			if (strategy.equals("numOcuurence")) {
 				if (eventWindowPositions.size() > minOccurence) {
-					score = 1.0;
+					score = CLUSTER_PRESENCE_SCORE;
 					scoreSet = true;
 					if (!anyCond) {
 						scores.put("numOcuurence", score);
@@ -65,7 +66,7 @@ public class EventLocality {
 				}
 				avInterval /= (eventWindowPositions.size() - 1);
 				if (avInterval <  maxIntervalAverage) {
-					score = 1.0;
+					score = CLUSTER_PRESENCE_SCORE;
 					scoreSet = true;
 					if (!anyCond) {
 						scores.put("averageInterval", score);
@@ -80,7 +81,7 @@ public class EventLocality {
 					}
 				}
 				if (maxInterval <  maxIntervalMax) {
-					score = 1.0;
+					score = CLUSTER_PRESENCE_SCORE;
 					scoreSet = true;
 					if (!anyCond) {
 						scores.put("maxInterval", score);
@@ -89,7 +90,7 @@ public class EventLocality {
 			} else if (strategy.equals("rangeOccurence")) {
 				long range  = findContguousOccurence(eventWindowPositions);
 				if (range > minRangeLength) {
-					score = 1.0;
+					score = CLUSTER_PRESENCE_SCORE;
 					scoreSet = true;
 					if (!anyCond) {
 						scores.put("rangeOccurence", score);
@@ -105,11 +106,11 @@ public class EventLocality {
 			}
 		}
 		
-		//or conditions
+		//and conditions
 		if (!anyCond) {
 			for (String strategy : strategies) {
 				if (null == scores.get(strategy)) {
-					score = 0;
+					score = EVENT_PRESENCE_SCORE;
 					break;
 				}
 			}
@@ -133,10 +134,11 @@ public class EventLocality {
 		boolean found = false;
 		
 		if (strategies.containsKey("numOcuurence")) {
-			score = 0;
 			if (eventWindowPositions.size() > minOccurence) {
-				score = 1.0;
-			} 
+				score = CLUSTER_PRESENCE_SCORE;
+			} else {
+				score = (double)eventWindowPositions.size() / minOccurence;
+			}
 
 			weightedScore = score * strategies.get("numOcuurence");
 			weightSum = strategies.get("numOcuurence");
@@ -149,9 +151,10 @@ public class EventLocality {
 				avInterval += (double)(eventWindowPositions.get(j+1) - eventWindowPositions.get(j));
 			}
 			avInterval /= (eventWindowPositions.size() - 1);
-			score = 0;
 			if (avInterval <  maxIntervalAverage) {
-				score = 1.0;				
+				score = CLUSTER_PRESENCE_SCORE;				
+			} else {
+				score = (double)maxIntervalAverage / avInterval;
 			}
 
 			weightedScore += score * strategies.get("averageInterval");
@@ -167,9 +170,10 @@ public class EventLocality {
 					maxInterval = interval;
 				}
 			}
-			score = 0;
 			if (maxInterval <  maxIntervalMax) {
-				score = 1.0;
+				score = CLUSTER_PRESENCE_SCORE;
+			} else {
+				score = (double)maxIntervalMax / maxInterval;
 			}
 
 			weightedScore += score * strategies.get("maxInterval");
@@ -179,9 +183,10 @@ public class EventLocality {
 		
 		if (strategies.containsKey("rangeOccurence")) {
 			long range  = findContguousOccurence(eventWindowPositions);
-			score = 0;
 			if (range > minRangeLength) {
-				score = 1.0;
+				score = CLUSTER_PRESENCE_SCORE;
+			} else {
+				score = (double)range / minRangeLength;
 			}
 			weightedScore += score * strategies.get("rangeOccurence");
 			weightSum = strategies.get("rangeOccurence");
@@ -236,9 +241,9 @@ public class EventLocality {
 		//try all strategies and quit after the first one that meets condition
 		for (String strategy : strategies) {
 			if (strategy.equals("numOcuurence")) {
-				long span = eventWindowTimes.get(eventWindowTimes.size() - 1) - eventWindowTimes.get(0); 
-				if (span > minOccurenceTimeSpan) {
-					score = 1.0;
+				long occurences = eventWindowTimes.size();
+				if (occurences > minOccurenceTimeSpan) {
+					score = CLUSTER_PRESENCE_SCORE;
 					scoreSet = true;
 					if (!anyCond) {
 						scores.put("numOcuurence", score);
@@ -251,7 +256,7 @@ public class EventLocality {
 				}
 				avInterval /= (eventWindowTimes.size() - 1);
 				if (avInterval <  maxTimeIntervalAverage) {
-					score = 1.0;
+					score = CLUSTER_PRESENCE_SCORE;
 					scoreSet = true;
 					if (!anyCond) {
 						scores.put("averageInterval", score);
@@ -266,7 +271,7 @@ public class EventLocality {
 					}
 				}
 				if (maxInterval <  maxTimeIntervalMax) {
-					score = 1.0;
+					score = CLUSTER_PRESENCE_SCORE;
 					scoreSet = true;
 					if (!anyCond) {
 						scores.put("maxInterval", score);
@@ -281,7 +286,7 @@ public class EventLocality {
 			}
 		}
 
-		//or conditions
+		//and conditions
 		if (!anyCond) {
 			for (String strategy : strategies) {
 				if (null == scores.get(strategy)) {
@@ -313,13 +318,15 @@ public class EventLocality {
 		
 		if (strategies.containsKey("numOcuurence")) {
 			found = true;
-			long span = eventWindowTimes.get(eventWindowTimes.size() - 1) - eventWindowTimes.get(0); 
-			if (span > minOccurenceTimeSpan) {
-				score = 1.0;
-				weightedScore = score * strategies.get("numOcuurence");
-				weightSum = strategies.get("numOcuurence");
-				scoreSet = true;
-			} 
+			long occurences = eventWindowTimes.size();
+			if (occurences > minOccurenceTimeSpan) {
+				score = CLUSTER_PRESENCE_SCORE;
+			} else {
+				score = (double)occurences / minOccurenceTimeSpan;
+			}
+			weightedScore = score * strategies.get("numOcuurence");
+			weightSum = strategies.get("numOcuurence");
+			scoreSet = true;
 		}
 		if (strategies.containsKey("averageInterval")) {
 			found = true;
@@ -328,12 +335,15 @@ public class EventLocality {
 				avInterval += (double)(eventWindowTimes.get(j+1) - eventWindowTimes.get(j));
 			}
 			avInterval /= (eventWindowTimes.size() - 1);
+			
 			if (avInterval <  maxTimeIntervalAverage) {
-				score = 1.0;
-				weightedScore += score * strategies.get("averageInterval");
-				weightSum += strategies.get("averageInterval");
-				scoreSet = true;
+				score = CLUSTER_PRESENCE_SCORE;
+			} else {
+				score = (double)maxTimeIntervalAverage / avInterval;
 			}
+			weightedScore += score * strategies.get("averageInterval");
+			weightSum += strategies.get("averageInterval");
+			scoreSet = true;
 		}	
 		if (strategies.containsKey("maxInterval")) {
 			found = true;
@@ -345,12 +355,13 @@ public class EventLocality {
 				}
 			}
 			if (maxInterval <  maxTimeIntervalMax) {
-				score = 1.0;
-				weightedScore += score * strategies.get("maxInterval");
-				weightSum += strategies.get("maxInterval");
-				scoreSet = true;
+				score = CLUSTER_PRESENCE_SCORE;
+			} else {
+				score = (double)maxTimeIntervalMax / maxInterval;
 			}
-			
+			weightedScore += score * strategies.get("maxInterval");
+			weightSum += strategies.get("maxInterval");
+			scoreSet = true;
 		}		
 
 		if (!found) {
