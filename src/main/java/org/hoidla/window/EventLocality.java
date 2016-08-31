@@ -51,7 +51,7 @@ public class EventLocality {
 		
 		//try all strategies and quit after the first one that meets condition
 		for (String strategy : strategies) {
-			if (strategy.equals("numOcuurence")) {
+			if (strategy.equals("numOccurence")) {
 				if (eventWindowPositions.size() > minOccurence) {
 					score = CLUSTER_PRESENCE_SCORE;
 					scoreSet = true;
@@ -133,7 +133,7 @@ public class EventLocality {
 		double weightSum = 0;
 		boolean found = false;
 		
-		if (strategies.containsKey("numOcuurence")) {
+		if (strategies.containsKey("numOccurence")) {
 			if (eventWindowPositions.size() > minOccurence) {
 				score = CLUSTER_PRESENCE_SCORE;
 			} else {
@@ -240,13 +240,13 @@ public class EventLocality {
 		
 		//try all strategies and quit after the first one that meets condition
 		for (String strategy : strategies) {
-			if (strategy.equals("numOcuurence")) {
+			if (strategy.equals("numOccurence")) {
 				long occurences = eventWindowTimes.size();
 				if (occurences > minOccurenceTimeSpan) {
 					score = CLUSTER_PRESENCE_SCORE;
 					scoreSet = true;
 					if (!anyCond) {
-						scores.put("numOcuurence", score);
+						scores.put("numOccurence", score);
 					}
 				} 
 			} else if (strategy.equals("averageInterval")) {
@@ -406,6 +406,21 @@ public class EventLocality {
 			this.anyCond = anyCond;
 		}
 
+		/**
+		 * @param minOccurence
+		 * @param maxIntervalAverage
+		 * @param maxIntervalMax
+		 * @param singleStatregies
+		 */
+		public Context(int minOccurence, long maxIntervalAverage, long maxIntervalMax, long minRangeLength, 
+				Map<String,Double> aggregateWeightedStrategies) {
+			super();
+			this.minOccurence = minOccurence;
+			this.maxIntervalAverage = maxIntervalAverage;
+			this.maxIntervalMax = maxIntervalMax;
+			this.minRangeLength = minRangeLength;
+			this.aggregateWeightedStrategies = aggregateWeightedStrategies;
+		}
 		
 		/**
 		 * @param aggregateWeightedStrategies
