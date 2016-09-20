@@ -10,6 +10,8 @@ The following blogs of mine are good source of details. These are the only sourc
 of detail documentation
 * http://pkghosh.wordpress.com/2014/09/10/realtime-trending-analysis-with-approximate-algorithms/
 * http://pkghosh.wordpress.com/2014/10/05/tracking-web-site-bounce-rate-in-real-time/
+* https://pkghosh.wordpress.com/2015/02/19/real-time-detection-of-outliers-in-sensor-data-using-spark-streaming/
+* https://pkghosh.wordpress.com/2016/09/19/alarm-flooding-control-with-event-clustering-using-spark-streaming/
 
 ## Solution
 * Probabilstic frequent count with sketches and count based algorithms
@@ -18,6 +20,7 @@ of detail documentation
 * Different sampling methods
 * Windowing including simple stats
 * Pattern detection
+* Event cluster detection
 
 ## Getting started
 Project's resource directory has various tutorial documents for the use cases described in the blogs.

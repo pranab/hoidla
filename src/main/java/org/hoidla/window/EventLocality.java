@@ -17,6 +17,7 @@
 
 package org.hoidla.window;
 
+import java.io.Serializable;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -242,6 +243,7 @@ public class EventLocality {
 		for (String strategy : strategies) {
 			if (strategy.equals("numOccurence")) {
 				long occurences = eventWindowTimes.size();
+				//System.out.println("occurences: " + occurences);
 				if (occurences > minOccurenceTimeSpan) {
 					score = CLUSTER_PRESENCE_SCORE;
 					scoreSet = true;
@@ -270,6 +272,7 @@ public class EventLocality {
 						maxInterval = interval;
 					}
 				}
+				//System.out.println("maxInterval: " + maxInterval);
 				if (maxInterval <  maxTimeIntervalMax) {
 					score = CLUSTER_PRESENCE_SCORE;
 					scoreSet = true;
@@ -290,6 +293,7 @@ public class EventLocality {
 		if (!anyCond) {
 			for (String strategy : strategies) {
 				if (null == scores.get(strategy)) {
+					//System.out.println("failed in AND condition");
 					score = EVENT_PRESENCE_SCORE;
 					break;
 				}
@@ -379,7 +383,7 @@ public class EventLocality {
 	 * @author pranab
 	 *
 	 */
-	public static class Context {
+	public static class Context implements Serializable {
 		public int minOccurence = 1;
 		public long maxIntervalAverage = -1;
 		public long maxIntervalMax = -1;

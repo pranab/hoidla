@@ -65,17 +65,23 @@ public class TimeBoundWindow extends DataWindow<TimeStamped> implements Serializ
 		TimeStamped earliest = getEarliest();
 		TimeStamped latest = getLatest();
 		if ((latest.getTimeStamp() - earliest.getTimeStamp()) > timeSpan) {
+			//System.out.println("in expire earliest: " + earliest.getTimeStamp() + 
+			//		" latest: " + latest.getTimeStamp() + " window size: " + size());
+			
 			//process window
 			processFullWindowHelper(earliest, latest);
 			
 			//manage window
 			long earliestRetained = latest.getTimeStamp() - timeSpan + timeStep;
 			ListIterator<TimeStamped> iter =  dataWindow.listIterator();
+			int numRemoved = 0;
 			while (iter.hasNext()) {
 				if (iter.next().getTimeStamp() < earliestRetained) {
 					iter.remove();
+					++numRemoved;
 				}
 			}
+			//System.out.println("in expire num of items removed: " + numRemoved + " window size: " + size());
 		}
 	}
 	
@@ -93,6 +99,7 @@ public class TimeBoundWindow extends DataWindow<TimeStamped> implements Serializ
 				processed = true;
 			}
 		} else {
+			//System.out.println("calling processFullWindow");
 			processFullWindow();
 			lastProcessedTime = latest.getTimeStamp();
 			processed = true;

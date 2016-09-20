@@ -66,9 +66,12 @@ public class TimeBoundEventLocalityAnalyzer extends TimeBoundWindow {
 			}
 		}
 
+		//System.out.println("num of events:" + eventWindowPositions.size());
+		
 		if (null != context.singleStatregies) {
 			score = EventLocality.getTimedEventSingleScore(eventWindowPositions, context.minOccurence, context.maxIntervalAverage, 
 				context.maxIntervalMax, context.singleStatregies, size(), context.anyCond);
+			//System.out.println("score: " + score);
 		} else {
 			score =   EventLocality.getTimedEventWeightedScore(eventWindowPositions, context.minOccurence, context.maxIntervalAverage, 
 					context.maxIntervalMax, context.aggregateWeightedStrategies,  size());
@@ -78,27 +81,40 @@ public class TimeBoundEventLocalityAnalyzer extends TimeBoundWindow {
 		TimeStamped latest = getLatest();
 		if (inCluster) {
 			if (score > scoreThreshold) {
+				//in cluster
+				//System.out.println("in cluster");
 				triggered = true;
 				lastTriggerTime = latest.getTimeStamp();
 			} else {
 				//cluster is ending 
+				//System.out.println("ending cluster");
 				inCluster = false;
 			}
 		} else {
-			if (score > 0) {
+			if (score > scoreThreshold) {
 				//cluster is starting
+				//System.out.println("starting cluster");
+				inCluster = true;
+				triggered = true;
+				lastTriggerTime = latest.getTimeStamp();
+			} else {
 				if (lastTriggerTime == 0 || 
 						(latest.getTimeStamp() - lastTriggerTime) > minEventTimeInterval) {
-					//should always trigger when cluster is forming
+					//in normal
+					//System.out.println("in  normal");
 					triggered = true;
 					lastTriggerTime = latest.getTimeStamp();
 				}
-				inCluster = true;
 			}
 		}
 		
 	}
 	
+	@Override
+	public void add(TimeStamped ts) {
+		triggered = false;
+		super.add(ts);
+	}
 	
 	/**
 	 * @return
