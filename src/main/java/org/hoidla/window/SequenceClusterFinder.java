@@ -32,19 +32,27 @@ public class SequenceClusterFinder {
 	private long maxInterval; 
 	private long minClusterMemeber;
 	
+	public SequenceClusterFinder() {
+	}
+	
 	/**
 	 * @param sequence
 	 * @param maxInterval
 	 * @param minSize
 	 */
-	public SequenceClusterFinder(List<Long> sequence, long maxInterval,
-			long minSize) {
+	public SequenceClusterFinder(List<Long> sequence, long maxInterval, long minSize) {
 		super();
 		this.sequence = sequence;
 		this.maxInterval = maxInterval;
 		minClusterMemeber = minSize / maxInterval;
 	}
 	
+	public void initialize(List<Long> sequence, long maxInterval, long minSize) {
+		this.sequence = sequence;
+		this.maxInterval = maxInterval;
+		minClusterMemeber = minSize / maxInterval;
+	}
+
 	/**
 	 * @return
 	 */

@@ -29,7 +29,7 @@ import java.util.Map;
  *
  */
 public class EventLocality {
-	
+	private static SequenceClusterFinder clusterFinder = new SequenceClusterFinder();
 	private static double EVENT_PRESENCE_SCORE = 0.5;
 	private static double CLUSTER_PRESENCE_SCORE = 1.0;
 	
@@ -44,8 +44,8 @@ public class EventLocality {
 	 * @return
 	 */
 	public static double getPositionalEventSingleScore(List<Long> eventWindowPositions, int minOccurence, 
-			long maxIntervalAverage,long maxIntervalMax, long minRangeLength, List<String> strategies, 
-			int windowSize, boolean anyCond) {
+			long maxIntervalAverage, boolean findClusterWithin, long minClusterSize, long maxIntervalMax, 
+			long minRangeLength, List<String> strategies,int windowSize, boolean anyCond) {
 		double score = EVENT_PRESENCE_SCORE;
 		boolean scoreSet = false;
 		Map<String, Double> scores = new HashMap<String, Double>();
@@ -71,6 +71,18 @@ public class EventLocality {
 					scoreSet = true;
 					if (!anyCond) {
 						scores.put("averageInterval", score);
+					}
+				} else {
+					//find clusters within window
+					if (findClusterWithin) {
+						clusterFinder.initialize(eventWindowPositions, maxIntervalAverage, minClusterSize);
+						if (!clusterFinder.findClusters().isEmpty()) {
+							score = CLUSTER_PRESENCE_SCORE;
+							scoreSet = true;
+							if (!anyCond) {
+								scores.put("averageInterval", score);
+							}
+						}
 					}
 				}
 			} else if (strategy.equals("maxInterval")) {
@@ -233,8 +245,8 @@ public class EventLocality {
 	 * @return
 	 */
 	public static double getTimedEventSingleScore(List<Long> eventWindowTimes, int minOccurenceTimeSpan, 
-			long maxTimeIntervalAverage,long maxTimeIntervalMax, List<String> strategies, long windowTimeSpan,
-			boolean anyCond) {
+			long maxTimeIntervalAverage,boolean findClusterWithin, long minClusterSize, long maxTimeIntervalMax, 
+			List<String> strategies, long windowTimeSpan,boolean anyCond) {
 		double score = EVENT_PRESENCE_SCORE;
 		boolean scoreSet = false;
 		Map<String, Double> scores = new HashMap<String, Double>();
@@ -262,6 +274,18 @@ public class EventLocality {
 					scoreSet = true;
 					if (!anyCond) {
 						scores.put("averageInterval", score);
+					}
+				} else {
+					//find clusters within window
+					if (findClusterWithin) {
+						clusterFinder.initialize(eventWindowTimes, maxTimeIntervalAverage, minClusterSize);
+						if (!clusterFinder.findClusters().isEmpty()) {
+							score = CLUSTER_PRESENCE_SCORE;
+							scoreSet = true;
+							if (!anyCond) {
+								scores.put("averageInterval", score);
+							}
+						}
 					}
 				}
 			} else if (strategy.equals("maxInterval")) {
@@ -386,12 +410,33 @@ public class EventLocality {
 	public static class Context implements Serializable {
 		public int minOccurence = 1;
 		public long maxIntervalAverage = -1;
+		boolean findClusterWithin;
+		long minClusterSize = -1;
 		public long maxIntervalMax = -1;
 		public long minRangeLength = -1;
 		public List<String> singleStatregies;
 		public Map<String,Double> aggregateWeightedStrategies;
 		public boolean anyCond;
 		
+
+		/**
+		 * @param minOccurence
+		 * @param maxIntervalAverage
+		 * @param maxIntervalMax
+		 * @param singleStatregies
+		 */
+		public Context(int minOccurence, long maxIntervalAverage, boolean findClusterWithin, long minClusterSize, 
+				long maxIntervalMax, long minRangeLength, List<String> singleStatregies, boolean anyCond) {
+			super();
+			this.minOccurence = minOccurence;
+			this.maxIntervalAverage = maxIntervalAverage;
+			this.findClusterWithin = findClusterWithin;
+			this.minClusterSize = minClusterSize;
+			this.maxIntervalMax = maxIntervalMax;
+			this.minRangeLength = minRangeLength;
+			this.singleStatregies = singleStatregies;
+			this.anyCond = anyCond;
+		}
 		
 		/**
 		 * @param minOccurence

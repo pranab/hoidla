@@ -70,7 +70,8 @@ public class TimeBoundEventLocalityAnalyzer extends TimeBoundWindow {
 		
 		if (null != context.singleStatregies) {
 			score = EventLocality.getTimedEventSingleScore(eventWindowPositions, context.minOccurence, context.maxIntervalAverage, 
-				context.maxIntervalMax, context.singleStatregies, size(), context.anyCond);
+					context.findClusterWithin, context.minClusterSize, context.maxIntervalMax, context.singleStatregies, 
+					size(), context.anyCond);
 			//System.out.println("score: " + score);
 		} else {
 			score =   EventLocality.getTimedEventWeightedScore(eventWindowPositions, context.minOccurence, context.maxIntervalAverage, 
