@@ -86,30 +86,51 @@ public class SizeBoundWindow<T> extends DataWindow<T> implements Serializable {
 		}
 	}
 	
+	/* (non-Javadoc)
+	 * @see org.hoidla.window.DataWindow#isFull()
+	 */
 	public boolean isFull() {
 		return dataWindow.size() == maxSize;
 	}
 
+	/**
+	 * @return
+	 */
 	public int getMaxSize() {
 		return maxSize;
 	}
 
+	/**
+	 * @param maxSize
+	 */
 	public void setMaxSize(int maxSize) {
 		this.maxSize = maxSize;
 	}
 
+	/**
+	 * @return
+	 */
 	public int getStepSize() {
 		return stepSize;
 	}
 
+	/**
+	 * @param stepSize
+	 */
 	public void setStepSize(int stepSize) {
 		this.stepSize = stepSize;
 	}
 
+	/**
+	 * @return
+	 */
 	public int getProcessStepSize() {
 		return processStepSize;
 	}
 
+	/**
+	 * @param processStepSize
+	 */
 	public void setProcessStepSize(int processStepSize) {
 		this.processStepSize = processStepSize;
 	}

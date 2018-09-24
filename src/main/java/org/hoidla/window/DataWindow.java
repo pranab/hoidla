@@ -19,6 +19,7 @@ package org.hoidla.window;
 
 import java.util.AbstractList;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedList;
 
@@ -158,5 +159,14 @@ public abstract class DataWindow<T> {
 	 */
 	public boolean isExpired() {
 		return expired;
+	}
+	
+	/**
+	 * @return
+	 */
+	public AbstractList<T> cloneWindow() {
+		AbstractList<T> clonedDataWindow =  new ArrayList<T>();
+		Collections.copy(clonedDataWindow, dataWindow);
+		return clonedDataWindow;
 	}
 }
