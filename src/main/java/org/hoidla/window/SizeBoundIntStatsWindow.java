@@ -21,7 +21,7 @@ package org.hoidla.window;
  * @author pranab
  *
  */
-public class SizeBoundStatsWindow  extends SizeBoundWindow<Integer> {
+public class SizeBoundIntStatsWindow  extends SizeBoundWindow<Integer> {
 	private double mean;
 	private double stdDev;
 	private double sum;
@@ -29,15 +29,24 @@ public class SizeBoundStatsWindow  extends SizeBoundWindow<Integer> {
 	private int count;
 	private boolean processed;
 	
-	public SizeBoundStatsWindow(int maxSize) {
+	/**
+	 * @param maxSize
+	 */
+	public SizeBoundIntStatsWindow(int maxSize) {
 		super(maxSize);
 	}
 	
+	/* (non-Javadoc)
+	 * @see org.hoidla.window.DataWindow#add(java.lang.Object)
+	 */
 	public void add(Integer value) {
 		processed = false;
 		super.add(value);
 	}
 	
+	/* (non-Javadoc)
+	 * @see org.hoidla.window.DataWindow#processFullWindow()
+	 */
 	public  void processFullWindow() {
 		sum = sumSq = 0;
 		count = 0;
@@ -52,22 +61,37 @@ public class SizeBoundStatsWindow  extends SizeBoundWindow<Integer> {
 		processed = true;
 	}
 
+	/**
+	 * @return
+	 */
 	public double getMean() {
 		return mean;
 	}
 
+	/**
+	 * @return
+	 */
 	public double getStdDev() {
 		return stdDev;
 	}
 
+	/**
+	 * @return
+	 */
 	public boolean isProcessed() {
 		return processed;
 	}
 
+	/**
+	 * @param processed
+	 */
 	public void setProcessed(boolean processed) {
 		this.processed = processed;
 	}
 	
+	/**
+	 * 
+	 */
 	public void forcedProcess() {
 		if (!processed) {
 			 processFullWindow();

@@ -59,6 +59,9 @@ public class TimeBoundWindow extends DataWindow<TimeStamped> implements Serializ
 		this.processingTimeStep = processingTimeStep;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.hoidla.window.DataWindow#expire()
+	 */
 	@Override
 	public void expire() {
 		//slide by timeStep duration
@@ -108,6 +111,9 @@ public class TimeBoundWindow extends DataWindow<TimeStamped> implements Serializ
 		return processed;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.hoidla.window.DataWindow#isFull()
+	 */
 	public boolean isFull() {
 		TimeStamped earliest = getEarliest();
 		TimeStamped latest = getLatest();

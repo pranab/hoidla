@@ -33,7 +33,7 @@ import org.hoidla.util.TimeStamped;
  */
 public class EventTimeBoundWindow extends DataWindow<EventTimeStamped>  implements Serializable {
 	private List<EventTimeStamped> extendedWindow = new ArrayList<EventTimeStamped>();
-	private SizeBoundStatsWindow statsWindow;
+	private SizeBoundIntStatsWindow statsWindow;
 	private double lagStdDevMult;
 	private long waterMark;
 	private int waterMarkLag;
@@ -56,7 +56,7 @@ public class EventTimeBoundWindow extends DataWindow<EventTimeStamped>  implemen
 	}
 	
 	public void createStatsWindow(int maxStatWindowSize) {
-		statsWindow = new SizeBoundStatsWindow(maxStatWindowSize);
+		statsWindow = new SizeBoundIntStatsWindow(maxStatWindowSize);
 	}
 	
 	/* (non-Javadoc)

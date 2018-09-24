@@ -33,13 +33,22 @@ public abstract class DataWindow<T> {
 	protected long count;
 	protected boolean expired;
 	
+	/**
+	 * 
+	 */
 	public DataWindow() {
 	}
 	
+	/**
+	 * @param withSequentialAccess
+	 */
 	public DataWindow(boolean withSequentialAccess) {
 		dataWindow = withSequentialAccess ? new LinkedList<T>() : new ArrayList<T>();
 	}
 	
+	/**
+	 * @param obj
+	 */
 	public void add(T obj) {
 		if (null == dataWindow) {
 			dataWindow = new ArrayList<T>();
@@ -49,57 +58,104 @@ public abstract class DataWindow<T> {
 		expire();
 	}
 	
+	/**
+	 * 
+	 */
 	public abstract void expire();
 	
+	/**
+	 * @return
+	 */
 	public Iterator<T> getIterator() {
 		return dataWindow.iterator();
 	}
 
+	/**
+	 * @return
+	 */
 	public int size() {
 		return dataWindow.size();
 	}
 	
+	/**
+	 * @param index
+	 * @param obj
+	 */
 	public void set(int index, T obj) {
 		dataWindow.set(index, obj);
 	}
 	
+	/**
+	 * @param index
+	 * @return
+	 */
 	public T get(int index) {
 		return dataWindow.get(index);
 	}
 	
+	/**
+	 * @return
+	 */
 	public T getEarliest() {
 		return dataWindow.get(0);
 	}
 	
+	/**
+	 * @return
+	 */
 	public T getLatest() {
 		return dataWindow.get(dataWindow.size() - 1);
 	}
 	
+	/**
+	 * 
+	 */
 	public  void processFullWindow() {
 	}
 	
+	/**
+	 * 
+	 */
 	public void clear() {
 		dataWindow.clear();
 	}
 	
+	/**
+	 * @return
+	 */
 	public abstract boolean isFull();
 
+	/**
+	 * @return
+	 */
 	public AbstractList<T> getDataWindow() {
 		return dataWindow;
 	}
 
+	/**
+	 * @param dataWindow
+	 */
 	public void setDataWindow(AbstractList<T> dataWindow) {
 		this.dataWindow = dataWindow;
 	}
 
+	/**
+	 * @return
+	 */
 	public long getCount() {
 		return count;
 	}
 
+	/**
+	 * @param count
+	 */
 	public void setCount(long count) {
 		this.count = count;
 	}
 
+	/**
+	 * @return
+	 */
 	public boolean isExpired() {
 		return expired;
 	}
