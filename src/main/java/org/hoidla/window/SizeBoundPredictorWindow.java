@@ -32,6 +32,7 @@ public class SizeBoundPredictorWindow extends SizeBoundWindow<Double> {
 	private double weightedAverage;
 	private double[] weights;
 	private double expSmoothingFactor;
+	private double regressed;
 	private boolean processed;
 	private String predictor;
 
@@ -63,6 +64,10 @@ public class SizeBoundPredictorWindow extends SizeBoundWindow<Double> {
 		return this;
 	}
 	
+	/**
+	 * @param expSmoothingFactor
+	 * @return
+	 */
 	public SizeBoundPredictorWindow withExpSmoothingFactor(double expSmoothingFactor) {
 		if (predictor.equals(PRED_EXP_SMOOTHING)) {
 			this.expSmoothingFactor = expSmoothingFactor;
@@ -92,29 +97,66 @@ public class SizeBoundPredictorWindow extends SizeBoundWindow<Double> {
 	 */
 	public  void processFullWindow() {
 		if (predictor.equals(PRED_AVERAGE)) {
-			sum =  0;
-			count = 0;
-			for (Double val : dataWindow) {
-				sum += val;
-				++count;
-			}
-			average = sum / count;
+			findAverage();
 		} else if (predictor.equals(PRED_MEDIAN)) {
-			AbstractList<Double> cloned = cloneWindow();
-			Collections.sort(cloned);
-			int half = cloned.size() / 2;
-			if (cloned.size() % 2 == 1) {
-				median = cloned.get(half);
-			} else {
-				median = (cloned.get(half - 1) + cloned.get(half)) / 2;
-			}
+			findMedian();
 		} else if (predictor.equals(PRED_WEIGHTED_AVERAGE) || predictor.equals(PRED_EXP_SMOOTHING)) {
 			findWeightedAverage();
+		} else if (predictor.equals(PRED_WEIGHTED_AVERAGE)) {
+			findRegressed();
+		} else {
+			throw new IllegalStateException("invalid predictor " + predictor);
 		}
 		
 		processed = true;
 	}
+	
+	/**
+	 * 
+	 */
+	public void findRegressed() {
+		findAverage();
+		double avX = (maxSize + 1) / 2.0;
+		double sum1 = 0;
+		double sum2 = 0;
+		for (int i = 0; i < dataWindow.size(); ++i) {
+			double xDiff = (i + 1) - avX;
+			double yDiff = dataWindow.get(i) - average;
+			sum1 += xDiff * yDiff;
+			sum2 += xDiff * xDiff;
+		}
+		double b1 = sum1 / sum2;
+		double b0 = average - b1 * avX;
+		regressed = b1 * (maxSize + 1) + b0;
+	}
+	
+	/**
+	 * 
+	 */
+	private void findAverage() {
+		sum =  0;
+		count = 0;
+		for (Double val : dataWindow) {
+			sum += val;
+			++count;
+		}
+		average = sum / count;
+	}
 
+	/**
+	 * 
+	 */
+	private void findMedian() {
+		AbstractList<Double> cloned = cloneWindow();
+		Collections.sort(cloned);
+		int half = cloned.size() / 2;
+		if (cloned.size() % 2 == 1) {
+			median = cloned.get(half);
+		} else {
+			median = (cloned.get(half - 1) + cloned.get(half)) / 2;
+		}
+	}
+	
 	/**
 	 * 
 	 */
@@ -153,6 +195,9 @@ public class SizeBoundPredictorWindow extends SizeBoundWindow<Double> {
 	 * @return
 	 */
 	public double getAverage() {
+		if (!predictor.equals(PRED_AVERAGE)) {
+			throw new IllegalStateException("not appropriate for the predictor " + predictor);
+		}
 		return average;
 	}
 
@@ -160,6 +205,9 @@ public class SizeBoundPredictorWindow extends SizeBoundWindow<Double> {
 	 * @return
 	 */
 	public double getMedian() {
+		if (!predictor.equals(PRED_MEDIAN)) {
+			throw new IllegalStateException("not appropriate for the predictor " + predictor);
+		}
 		return median;
 	}
 
@@ -167,7 +215,20 @@ public class SizeBoundPredictorWindow extends SizeBoundWindow<Double> {
 	 * @return
 	 */
 	public double getWeightedAverage() {
+		if (!predictor.equals(PRED_WEIGHTED_AVERAGE) && !predictor.equals(PRED_EXP_SMOOTHING)) {
+			throw new IllegalStateException("not appropriate for the predictor " + predictor);
+		}
 		return weightedAverage;
+	}
+
+	/**
+	 * @return
+	 */
+	public double getRegressed() {
+		if (!predictor.equals(PRED_LINEAR_REGRESSION)) {
+			throw new IllegalStateException("not appropriate for the predictor " + predictor);
+		}
+		return regressed;
 	}
 
 }
