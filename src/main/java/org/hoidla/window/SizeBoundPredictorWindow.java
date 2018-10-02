@@ -102,7 +102,7 @@ public class SizeBoundPredictorWindow extends SizeBoundWindow<Double> {
 			findMedian();
 		} else if (predictor.equals(PRED_WEIGHTED_AVERAGE) || predictor.equals(PRED_EXP_SMOOTHING)) {
 			findWeightedAverage();
-		} else if (predictor.equals(PRED_WEIGHTED_AVERAGE)) {
+		} else if (predictor.equals(PRED_LINEAR_REGRESSION)) {
 			findRegressed();
 		} else {
 			throw new IllegalStateException("invalid predictor " + predictor);
@@ -229,6 +229,25 @@ public class SizeBoundPredictorWindow extends SizeBoundWindow<Double> {
 			throw new IllegalStateException("not appropriate for the predictor " + predictor);
 		}
 		return regressed;
+	}
+	
+	/**
+	 * @return
+	 */
+	public double getPrediction() {
+		double prediction = 0;
+		if (predictor.equals(PRED_AVERAGE)) {
+			prediction = getAverage();
+		} else if (predictor.equals(PRED_MEDIAN)) {
+			prediction = getMedian();
+		} else if (predictor.equals(PRED_WEIGHTED_AVERAGE) || predictor.equals(PRED_EXP_SMOOTHING)) {
+			prediction = getWeightedAverage();
+		} else if (predictor.equals(PRED_LINEAR_REGRESSION)) {
+			prediction = getRegressed();
+		} else {
+			throw new IllegalStateException("invalid predictor " + predictor);
+		}
+		return prediction;
 	}
 
 }
