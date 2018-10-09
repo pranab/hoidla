@@ -33,6 +33,7 @@ public abstract class DataWindow<T> {
 	protected AbstractList<T> dataWindow =  new ArrayList<T>();
 	protected long count;
 	protected boolean expired;
+	protected boolean addFirst = true;
 	
 	/**
 	 * 
@@ -47,6 +48,14 @@ public abstract class DataWindow<T> {
 		dataWindow = withSequentialAccess ? new LinkedList<T>() : new ArrayList<T>();
 	}
 	
+	/**
+	 * @param addFirst
+	 * @return
+	 */
+	public DataWindow<T> withAddFirst(boolean addFirst) {
+		this.addFirst = addFirst;
+		return this;
+	}
 	/**
 	 * @param obj
 	 */
@@ -168,5 +177,12 @@ public abstract class DataWindow<T> {
 		AbstractList<T> clonedDataWindow =  new ArrayList<T>();
 		Collections.copy(clonedDataWindow, dataWindow);
 		return clonedDataWindow;
+	}
+	
+	/**
+	 * @param obj
+	 */
+	public void replaceRecent(T obj) {
+		dataWindow.add(dataWindow.size()-1, obj);
 	}
 }

@@ -18,6 +18,7 @@
 package org.hoidla.window;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 
 
 /**
@@ -58,16 +59,55 @@ public class SizeBoundWindow<T> extends DataWindow<T> implements Serializable {
 		this(maxSize, stepSize);
 		this.processStepSize = processStepSize;
 	}
+	
+	/* (non-Javadoc)
+	 * @see org.hoidla.window.DataWindow#add(java.lang.Object)
+	 */
+	@Override
+	public void add(T obj) {
+		if (null == dataWindow) {
+			dataWindow = new ArrayList<T>();
+		}
+		if (addFirst) {
+			dataWindow.add(obj);
+			++count;
+			process();
+			slide();
+		} else {
+			process();
+			dataWindow.add(obj);
+			++count;
+			slide();
+		}
+	}
+	
 
 	/* (non-Javadoc)
 	 * @see org.hoidla.window.DataWindow#expire()
 	 */
+	@Override
 	public void expire() {
+		//process window data
+		process();
+		
+		//slide window
+		slide();
+	}
+	
+	/**
+	 * 
+	 */
+	private void process() {
 		//process window data
 		if (count % processStepSize == 0) {
 			processFullWindow();
 		}
-		
+	}
+	
+	/**
+	 * 
+	 */
+	private void slide() {
 		//slide window
 		if (dataWindow.size() > maxSize) {
 			//manage window
