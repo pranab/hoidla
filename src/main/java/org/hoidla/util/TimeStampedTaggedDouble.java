@@ -20,24 +20,11 @@ package org.hoidla.util;
 /**
  * @author pranab
  *
- * @param <T>
  */
-public class TimeStampedTaggedData<T>  extends TimeStampedData<T>{
-	protected String tag;
-	
-	public TimeStampedTaggedData(T obj, long timestamp) {
-		super(obj, timestamp);
+public class TimeStampedTaggedDouble extends TimeStampedTaggedData<Double >{
+
+	public TimeStampedTaggedDouble(Double obj, long timestamp, String tag) {
+		super(obj, timestamp, tag);
 	}
 
-	public TimeStampedTaggedData(T obj, long timestamp, String tag) {
-		super(obj, timestamp);
-		this.tag = tag;
-	}
-	public String getTag() {
-		return tag;
-	}
-
-	public void setTag(String tag) {
-		this.tag = tag;
-	}
 }
