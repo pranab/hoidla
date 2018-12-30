@@ -69,11 +69,11 @@ public class OutlierBasedLevelShiftDetector extends SizeBoundWindow<TimeStampedT
 		newLevelShift = false;
 		if (violationCount <= maxToleranace) {
 			if (!levelShifted) {
-				levelShiftStart = dataWindow.get(0).getTimestamp();
+				levelShiftStart = dataWindow.get(0).getTimeStamp();
 				levelShifted = true;
 				newLevelShift = true;
 			}
-			levelShiftEnd = dataWindow.get(dataWindow.size()-1).getTimestamp();
+			levelShiftEnd = dataWindow.get(dataWindow.size()-1).getTimeStamp();
 		} else {
 			levelShifted = false;
 		}

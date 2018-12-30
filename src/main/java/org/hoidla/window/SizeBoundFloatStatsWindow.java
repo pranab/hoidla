@@ -17,11 +17,18 @@
 
 package org.hoidla.window;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
 public class SizeBoundFloatStatsWindow extends SizeBoundWindow<Double> {
 	private double mean;
 	private double stdDev;
 	private double sum;
 	private double sumSq;
+	private double min;
+	private double max;
+	private double median;
 	private int count;
 	private boolean processed;
 	
@@ -46,14 +53,33 @@ public class SizeBoundFloatStatsWindow extends SizeBoundWindow<Double> {
 	public  void processFullWindow() {
 		sum = sumSq = 0;
 		count = 0;
+		min = Double.MAX_VALUE;
+		max = Double.MIN_VALUE;
+		List<Double> values = new ArrayList<Double>();
 		for (Double val : dataWindow) {
 			sum += val;
 			sumSq += val * val;
+			if (val < min)
+				min = val;
+			if (val > max)
+				max = val;
+			values.add(val);
 			++count;
 		}
 		
 		mean = sum / count;
-		stdDev = Math.sqrt(sumSq / count - mean * mean);
+		double var = sumSq / count - mean * mean;
+		var = (var * (count -1)) / count;
+		stdDev = Math.sqrt(var);
+		
+		Collections.sort(values);
+		int size = size();
+		int mid = size / 2;
+		if (size % 2 == 1) {
+			median = values.get(mid);
+		} else {
+			median = (values.get(mid -1) + values.get(mid)) / 2;
+		}
 		processed = true;
 	}
 
@@ -69,6 +95,27 @@ public class SizeBoundFloatStatsWindow extends SizeBoundWindow<Double> {
 	 */
 	public double getStdDev() {
 		return stdDev;
+	}
+
+	/**
+	 * @return
+	 */
+	public double getMin() {
+		return min;
+	}
+
+	/**
+	 * @return
+	 */
+	public double getMax() {
+		return max;
+	}
+
+	/**
+	 * @return
+	 */
+	public double getMedian() {
+		return median;
 	}
 
 	/**

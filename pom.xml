@@ -91,6 +91,12 @@ xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/ma
 			<artifactId>commons-math3</artifactId>
 			<version>3.3</version>
 		</dependency>
+		
+        <dependency>
+            <groupId>mawazo</groupId>
+            <artifactId>chombo</artifactId>
+            <version>1.0</version>
+        </dependency>
  
     </dependencies>
 

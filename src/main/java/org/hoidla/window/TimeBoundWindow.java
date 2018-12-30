@@ -28,10 +28,10 @@ import org.hoidla.util.TimeStamped;
  *
  */
 public class TimeBoundWindow extends DataWindow<TimeStamped> implements Serializable {
-	private long timeSpan;
-	private long timeStep = 0;
-	private long processingTimeStep = -1;
-	private long lastProcessedTime = -1;
+	protected long timeSpan;
+	protected long timeStep = 0;
+	protected long processingTimeStep = -1;
+	protected long lastProcessedTime = -1;
 	
 	/**
 	 * @param timeSpan

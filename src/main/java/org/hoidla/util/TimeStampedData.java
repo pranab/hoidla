@@ -22,14 +22,14 @@ package org.hoidla.util;
  *
  * @param <T>
  */
-public class TimeStampedData<T> {
+public class TimeStampedData<T> implements TimeStamped {
 	private T value;
-	private long timestamp;
+	private long timeStamp;
 	
 	public TimeStampedData(T value, long timestamp) {
 		super();
 		this.value = value;
-		this.timestamp = timestamp;
+		this.timeStamp = timestamp;
 	}
 
 	public T getValue() {
@@ -40,12 +40,11 @@ public class TimeStampedData<T> {
 		this.value = value;
 	}
 
-	public long getTimestamp() {
-		return timestamp;
+	public long getTimeStamp() {
+		return timeStamp;
 	}
 
-	public void setTimestamp(long timestamp) {
-		this.timestamp = timestamp;
+	public void setTimestamp(long timeStamp) {
+		this.timeStamp = timeStamp;
 	}
-	
 }
