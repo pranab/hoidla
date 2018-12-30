@@ -31,6 +31,7 @@ public class TimeBoundStatsWindow extends TimeBoundWindow {
 	private double stdDev;
 	private double min;
 	private double max;
+	private double median;
 	private SimpleStat stats = new SimpleStat();
 
 	public TimeBoundStatsWindow(long timeSpan, long timeStep, long processingTimeStep) {
@@ -58,6 +59,7 @@ public class TimeBoundStatsWindow extends TimeBoundWindow {
 		stdDev = stats.getStdDev();
 		min = stats.getMin();
 		max = stats.getMax();
+		median = stats.getMedian();
 		stats.initialize();
 	}
 	
@@ -87,6 +89,12 @@ public class TimeBoundStatsWindow extends TimeBoundWindow {
 	 */
 	public double getMax() {
 		return max;
+	}
+	/**
+	 * @return
+	 */
+	public double getMedian() {
+		return median;
 	}
 	
 }
