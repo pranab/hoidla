@@ -14,12 +14,13 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
  * implied. See the License for the specific language governing
  * permissions and limitations under the License.
- * Credit: Robert Sedgewick and Kevin Wayne of Princeton University
+ * Credit: Robert Sedgewick and Kevin Wayne of Princeton University with changes
  */
 
 package org.hoidla.analyze;
 
 import org.chombo.math.Complex;
+import org.chombo.math.MathUtils;
 
 /**
  * fast fourier transforms
@@ -41,8 +42,8 @@ public class FastFourierTransform {
 			return new Complex[] { x[0] };
 
         // radix 2 Cooley-Tukey FFT
-		if (n % 2 != 0) {
-			throw new IllegalArgumentException("n is not a power of 2");
+		if (!MathUtils.isPowerOfTwo(n)) {
+			throw new IllegalArgumentException("data size is not a power of 2");
 		}
 
 		// fft of even terms
@@ -174,7 +175,7 @@ public class FastFourierTransform {
 
         // original data
         for (int i = 0; i < n; i++) {
-            x[i] = new Complex(i, 0);
+            //x[i] = new Complex(i, 0);
             x[i] = new Complex(-2*Math.random() + 1, 0);
         }
         show(x, "x");
