@@ -75,7 +75,7 @@ public class EventLocality {
 				} else {
 					//find clusters within window
 					if (findClusterWithin) {
-						clusterFinder.initialize(eventWindowPositions, maxIntervalAverage, minClusterSize);
+						clusterFinder.initialize(eventWindowPositions, maxIntervalAverage, maxIntervalMax, minClusterSize, strategy);
 						if (!clusterFinder.findClusters().isEmpty()) {
 							score = CLUSTER_PRESENCE_SCORE;
 							scoreSet = true;
@@ -278,7 +278,7 @@ public class EventLocality {
 				} else {
 					//find clusters within window
 					if (findClusterWithin) {
-						clusterFinder.initialize(eventWindowTimes, maxTimeIntervalAverage, minClusterSize);
+						clusterFinder.initialize(eventWindowTimes, maxTimeIntervalAverage, 0, minClusterSize, "averageInterval");
 						if (!clusterFinder.findClusters().isEmpty()) {
 							score = CLUSTER_PRESENCE_SCORE;
 							scoreSet = true;

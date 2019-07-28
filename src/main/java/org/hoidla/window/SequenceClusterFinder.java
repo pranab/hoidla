@@ -29,8 +29,11 @@ import java.util.ListIterator;
  */
 public class SequenceClusterFinder {
 	private List<Long> sequence;
-	private long maxInterval; 
+	private long maxAvInterval; 
 	private long minClusterMemeber;
+	private String strategy;
+	private long maxInterval; 
+	private List<List<Long>> clusters;
 	
 	public SequenceClusterFinder() {
 	}
@@ -40,17 +43,32 @@ public class SequenceClusterFinder {
 	 * @param maxInterval
 	 * @param minSize
 	 */
-	public SequenceClusterFinder(List<Long> sequence, long maxInterval, long minSize) {
+	public SequenceClusterFinder(List<Long> sequence, long maxAvInterval, long maxInterval, long minSize, String strategy) {
 		super();
-		this.sequence = sequence;
-		this.maxInterval = maxInterval;
-		minClusterMemeber = minSize / maxInterval;
+		initialize(sequence, maxAvInterval, maxInterval, minSize, strategy);
 	}
 	
-	public void initialize(List<Long> sequence, long maxInterval, long minSize) {
+	/**
+	 * @param sequence
+	 * @param maxAvInterval
+	 * @param maxInterval
+	 * @param strategy
+	 */
+	public SequenceClusterFinder(List<Long> sequence, long maxAvInterval, long maxInterval,  String strategy) {
+		super();
+		initialize(sequence, maxAvInterval, maxInterval, -1, strategy);
+	}
+
+	public void initialize(List<Long> sequence, long maxAvInterval, long maxInterval, long minSize, String strategy) {
 		this.sequence = sequence;
+		this.maxAvInterval = maxAvInterval;
 		this.maxInterval = maxInterval;
-		minClusterMemeber = minSize / maxInterval;
+		if (minSize > 0) {
+			minClusterMemeber = minSize / maxAvInterval;
+		} else {
+			minClusterMemeber = -1;
+		}
+		this.strategy = strategy;
 	}
 
 	/**
@@ -61,27 +79,55 @@ public class SequenceClusterFinder {
 		List<Long> latestcluster = null;
 		
 		//find clusters
-		for (long val : sequence) {
-			if (clusters.isEmpty()) {
-				latestcluster = createCluster(val, clusters);
-			} else {
-				if ((val - latestcluster.get(latestcluster.size() -1)) < maxInterval) {
-					//add to nearest cluster
-					latestcluster.add(val);
-				} else {
-					//create new cluster
+		if (strategy.equals("averageInterval")) {
+			for (long val : sequence) {
+				if (clusters.isEmpty()) {
 					latestcluster = createCluster(val, clusters);
+				} else {
+					boolean toAdd = false;
+					if (findAverageInterVal(latestcluster, val) < maxAvInterval) {
+						toAdd = true;
+						if (strategy.equals("both")) {
+							toAdd = (val - latestcluster.get(latestcluster.size() - 1)) < maxInterval;
+						}
+						//add to nearest cluster
+						if (toAdd) {
+							latestcluster.add(val);
+						}
+					} 
+					if (!toAdd) {
+						//create new cluster
+						latestcluster = createCluster(val, clusters);
+					}
 				}
 			}
+		} else if (strategy.equals("maxInterval")) {
+			for (long val : sequence) {
+				if (clusters.isEmpty()) {
+					latestcluster = createCluster(val, clusters);
+				} else {
+					if ((val - latestcluster.get(latestcluster.size() - 1)) < maxInterval) {
+						latestcluster.add(val);
+					} else {
+						//create new cluster
+						latestcluster = createCluster(val, clusters);
+					}
+				}	
+			}
+		} else {
+			throw new IllegalStateException("invalid sequence clustering strategy");
 		}
 		
 		//filter out small clusters
-		ListIterator<List<Long>> iter = clusters.listIterator();
-		while (iter.hasNext()) {
-			if (iter.next().size() < minClusterMemeber) {
-				iter.remove();
+		if (minClusterMemeber > 0) {
+			ListIterator<List<Long>> iter = clusters.listIterator();
+			while (iter.hasNext()) {
+				if (iter.next().size() < minClusterMemeber) {
+					iter.remove();
+				}
 			}
 		}
+		this.clusters = clusters;
 		return clusters;
 	}
 	
@@ -96,5 +142,60 @@ public class SequenceClusterFinder {
 		return cluster;
 	}
 	
+	/**
+	 * @param cluster
+	 * @param newData
+	 * @return
+	 */
+	private long findAverageInterVal(List<Long> cluster, Long newData) {
+		long avearge = 0;
+		long sum = 0;
+		if (cluster.size() > 1) {
+			for (int i = 1; i < cluster.size(); ++i) {
+				sum += (cluster.get(i) - cluster.get(i-1));
+			}
+		}
+		sum += newData - cluster.get(cluster.size() - 1);
+		avearge = sum / cluster.size();
+		return avearge;
+	}
 	
+	/**
+	 * @return
+	 */
+	public List<List<Long>> getPrototypes(int minClusterMemeber) {
+		List<List<Long>> prototypes = new ArrayList<List<Long>>();
+		for (List<Long> cluster : clusters) {
+			if (cluster.size() <= minClusterMemeber) {
+				//as is
+				prototypes.add(new ArrayList<Long>(cluster));
+			} else {
+				//find center
+				long sum = 0;
+				for (Long pos : cluster) {
+					sum += pos;
+				}
+				long center = sum / cluster.size();
+				
+				//find left nearest
+				int nearest = 0;
+				for (int i = 0; i < cluster.size(); ++i) {
+					if (center >=  cluster.get(i)) {
+						nearest = i;
+						break;
+					}
+				}
+				
+				//closest to center is prototype
+				List<Long> proto = new ArrayList<Long>();
+				if ((center - cluster.get(nearest)) < (cluster.get(nearest + 1) - center)) {
+					proto.add(cluster.get(nearest));
+				} else {
+					proto.add(cluster.get(nearest+1));
+				}
+				prototypes.add(proto);
+			}
+		}
+		return prototypes;
+	}
 }
