@@ -17,6 +17,7 @@
 
 package org.hoidla.window;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ListIterator;
@@ -27,7 +28,7 @@ import java.util.ListIterator;
  * @author pranab
  *
  */
-public class SequenceClusterFinder {
+public class SequenceClusterFinder implements Serializable {
 	private List<Long> sequence;
 	private long maxAvInterval; 
 	private long minClusterMemeber;
@@ -161,41 +162,86 @@ public class SequenceClusterFinder {
 	}
 	
 	/**
+	 * @param minClusterMemeber
 	 * @return
 	 */
 	public List<List<Long>> getPrototypes(int minClusterMemeber) {
+		return getPrototypes(minClusterMemeber, "center", null);
+	}
+	
+	/**
+	 * @param minClusterMemeber
+	 * @param protoStrategy
+	 * @param scores
+	 * @return
+	 */
+	public List<List<Long>> getPrototypes(int minClusterMemeber, String protoStrategy, List<Double> scores) {
 		List<List<Long>> prototypes = new ArrayList<List<Long>>();
 		for (List<Long> cluster : clusters) {
 			if (cluster.size() <= minClusterMemeber) {
 				//as is
 				prototypes.add(new ArrayList<Long>(cluster));
 			} else {
-				//find center
-				long sum = 0;
-				for (Long pos : cluster) {
-					sum += pos;
-				}
-				long center = sum / cluster.size();
-				
-				//find left nearest
-				int nearest = 0;
-				for (int i = 0; i < cluster.size(); ++i) {
-					if (center >=  cluster.get(i)) {
-						nearest = i;
-						break;
-					}
-				}
-				
-				//closest to center is prototype
-				List<Long> proto = new ArrayList<Long>();
-				if ((center - cluster.get(nearest)) < (cluster.get(nearest + 1) - center)) {
-					proto.add(cluster.get(nearest));
+				List<Long> proto = null;
+				if (protoStrategy.equals("center")){
+					proto = getCenterBasedProto(cluster);
+				} else if (protoStrategy.equals("maxScore")) {
+					proto = getMaxScoreBasedProto(cluster, scores);
 				} else {
-					proto.add(cluster.get(nearest+1));
+					throw new IllegalStateException("invalid cluster prototype strategy");
 				}
+				
 				prototypes.add(proto);
 			}
 		}
 		return prototypes;
+	}
+	
+	/**
+	 * @param cluster
+	 * @return
+	 */
+	private List<Long> getCenterBasedProto(List<Long> cluster) {
+		long sum = 0;
+		for (Long pos : cluster) {
+			sum += pos;
+		}
+		long center = sum / cluster.size();
+		
+		//find left nearest
+		int nearest = 0;
+		for (int i = 0; i < cluster.size(); ++i) {
+			if (center >=  cluster.get(i)) {
+				nearest = i;
+				break;
+			}
+		}
+		
+		//closest to center is prototype
+		List<Long> proto = new ArrayList<Long>();
+		if ((center - cluster.get(nearest)) < (cluster.get(nearest + 1) - center)) {
+			proto.add(cluster.get(nearest));
+		} else {
+			proto.add(cluster.get(nearest+1));
+		}
+		return proto;
+	}
+	
+	/**
+	 * @param cluster
+	 * @param scores
+	 * @return
+	 */
+	private List<Long> getMaxScoreBasedProto(List<Long> cluster, List<Double>scores) {
+		List<Long> proto = new ArrayList<Long>();
+		double maxScore = Double.MIN_VALUE;
+		int maxIndx = 0;
+		for (int i = 0; i < scores.size(); ++i) {
+			if (scores.get(i) > maxScore) {
+				maxIndx = i;
+			}
+		}
+		proto.add(cluster.get(maxIndx));
+		return proto;
 	}
 }
