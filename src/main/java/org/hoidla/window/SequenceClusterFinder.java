@@ -165,8 +165,8 @@ public class SequenceClusterFinder implements Serializable {
 	 * @param minClusterMemeber
 	 * @return
 	 */
-	public List<List<Long>> getPrototypes(int minClusterMemeber) {
-		return getPrototypes(minClusterMemeber, "center", null);
+	public List<List<Long>> getPrototypes(int minClusterMemeber, boolean ignoreSmallCluser) {
+		return getPrototypes(minClusterMemeber, "center", null, ignoreSmallCluser);
 	}
 	
 	/**
@@ -175,12 +175,13 @@ public class SequenceClusterFinder implements Serializable {
 	 * @param scores
 	 * @return
 	 */
-	public List<List<Long>> getPrototypes(int minClusterMemeber, String protoStrategy, List<Double> scores) {
+	public List<List<Long>> getPrototypes(int minClusterMemeber, String protoStrategy, List<Double> scores, boolean ignoreSmallCluser) {
 		List<List<Long>> prototypes = new ArrayList<List<Long>>();
 		for (List<Long> cluster : clusters) {
 			if (cluster.size() <= minClusterMemeber) {
 				//as is
-				prototypes.add(new ArrayList<Long>(cluster));
+				if (!ignoreSmallCluser)
+					prototypes.add(new ArrayList<Long>(cluster));
 			} else {
 				List<Long> proto = null;
 				if (protoStrategy.equals("center")){
