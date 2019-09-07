@@ -20,6 +20,10 @@ package org.hoidla.window;
 import java.util.AbstractList;
 import java.util.Collections;
 
+import org.chombo.util.BasicUtils;
+import org.hoidla.forecast.ExponentialSmoothing;
+import org.hoidla.forecast.Forecaster;
+
 /**
  * @author pranab
  *
@@ -35,6 +39,9 @@ public class SizeBoundPredictorWindow extends SizeBoundWindow<Double> {
 	private double regressed;
 	private boolean processed;
 	private String predictor;
+	private String[] configParams;
+	private Forecaster forecaster;
+	private double forecasted;
 
 	public static final String PRED_AVERAGE = "average";
 	public static final String PRED_MEDIAN = "median";
@@ -50,6 +57,18 @@ public class SizeBoundPredictorWindow extends SizeBoundWindow<Double> {
 		super(maxSize);
 		this.predictor = predictor;
 	}
+	
+	/**
+	 * @param configParams
+	 * @return
+	 */
+	public SizeBoundPredictorWindow withConfigParams(String[] configParams) {
+		if (predictor.equals(PRED_EXP_SMOOTHING)) {
+			forecaster = new ExponentialSmoothing(configParams);
+		}
+		return this;
+	}
+	
 	
 	/**
 	 * @param weights
@@ -100,8 +119,10 @@ public class SizeBoundPredictorWindow extends SizeBoundWindow<Double> {
 			findAverage();
 		} else if (predictor.equals(PRED_MEDIAN)) {
 			findMedian();
-		} else if (predictor.equals(PRED_WEIGHTED_AVERAGE) || predictor.equals(PRED_EXP_SMOOTHING)) {
+		} else if (predictor.equals(PRED_WEIGHTED_AVERAGE)) {
 			findWeightedAverage();
+		} else if (predictor.equals(PRED_EXP_SMOOTHING)) {
+			findForecast();
 		} else if (predictor.equals(PRED_LINEAR_REGRESSION)) {
 			findRegressed();
 		} else {
@@ -167,7 +188,13 @@ public class SizeBoundPredictorWindow extends SizeBoundWindow<Double> {
 		}
 		weightedAverage = sum / dataWindow.size();
 	}
-
+	
+	/**
+	 * 
+	 */
+	private void findForecast() {
+		forecasted = forecaster.forecast(dataWindow);
+	}
 	/**
 	 * @return
 	 */
@@ -195,9 +222,7 @@ public class SizeBoundPredictorWindow extends SizeBoundWindow<Double> {
 	 * @return
 	 */
 	public double getAverage() {
-		if (!predictor.equals(PRED_AVERAGE)) {
-			throw new IllegalStateException("not appropriate for the predictor " + predictor);
-		}
+		BasicUtils.assertCondition(predictor.equals(PRED_AVERAGE), "not appropriate for the predictor " + predictor);
 		return average;
 	}
 
@@ -205,9 +230,7 @@ public class SizeBoundPredictorWindow extends SizeBoundWindow<Double> {
 	 * @return
 	 */
 	public double getMedian() {
-		if (!predictor.equals(PRED_MEDIAN)) {
-			throw new IllegalStateException("not appropriate for the predictor " + predictor);
-		}
+		BasicUtils.assertCondition(predictor.equals(PRED_MEDIAN), "not appropriate for the predictor " + predictor);
 		return median;
 	}
 
@@ -215,9 +238,7 @@ public class SizeBoundPredictorWindow extends SizeBoundWindow<Double> {
 	 * @return
 	 */
 	public double getWeightedAverage() {
-		if (!predictor.equals(PRED_WEIGHTED_AVERAGE) && !predictor.equals(PRED_EXP_SMOOTHING)) {
-			throw new IllegalStateException("not appropriate for the predictor " + predictor);
-		}
+		BasicUtils.assertCondition(predictor.equals(PRED_WEIGHTED_AVERAGE), "not appropriate for the predictor " + predictor);
 		return weightedAverage;
 	}
 
@@ -225,12 +246,17 @@ public class SizeBoundPredictorWindow extends SizeBoundWindow<Double> {
 	 * @return
 	 */
 	public double getRegressed() {
-		if (!predictor.equals(PRED_LINEAR_REGRESSION)) {
-			throw new IllegalStateException("not appropriate for the predictor " + predictor);
-		}
+		BasicUtils.assertCondition(predictor.equals(PRED_LINEAR_REGRESSION), "not appropriate for the predictor " + predictor);
 		return regressed;
 	}
 	
+	/**
+	 * @return
+	 */
+	public double getForecast() {
+		BasicUtils.assertCondition(predictor.equals(PRED_EXP_SMOOTHING), "not appropriate for the predictor " + predictor);
+		return forecasted;
+	}
 	/**
 	 * @return
 	 */
@@ -240,8 +266,10 @@ public class SizeBoundPredictorWindow extends SizeBoundWindow<Double> {
 			prediction = getAverage();
 		} else if (predictor.equals(PRED_MEDIAN)) {
 			prediction = getMedian();
-		} else if (predictor.equals(PRED_WEIGHTED_AVERAGE) || predictor.equals(PRED_EXP_SMOOTHING)) {
+		} else if (predictor.equals(PRED_WEIGHTED_AVERAGE)) {
 			prediction = getWeightedAverage();
+		} else if (predictor.equals(PRED_EXP_SMOOTHING)) {
+			prediction = getForecast();
 		} else if (predictor.equals(PRED_LINEAR_REGRESSION)) {
 			prediction = getRegressed();
 		} else {
