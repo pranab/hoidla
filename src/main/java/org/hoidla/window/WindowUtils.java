@@ -23,6 +23,7 @@ import java.util.List;
 import org.apache.commons.math3.stat.Frequency;
 import org.apache.commons.math3.stat.StatUtils;
 import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
+import org.chombo.util.BasicUtils;
 import org.hoidla.util.ExplicitlyTimeStamped;
 import org.hoidla.util.ImplicitlyTimeStamped;
 import org.hoidla.util.TimeStamped;
@@ -533,6 +534,23 @@ public  class WindowUtils {
 		}
 		
 		return entropy;
+	}
+	
+	/**
+	 * @param data
+	 * @param windowSize
+	 * @param filteredDataSize
+	 */
+	public static double[] lowPassFilter(double[] data, int windowSize) {
+		List<Double> filteredData = new ArrayList<Double>();
+		SizeBoundFloatStatsWindow window = new SizeBoundFloatStatsWindow(windowSize, false);
+		for (int i = 0, j = 0; i < data.length; ++i) {
+			window.add(data[i]);
+			if (window.isFull()) {
+				filteredData.add(window.getMean());
+			}
+		}
+		return BasicUtils.fromListToDoubleArray(filteredData);
 	}
 	
 }

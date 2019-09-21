@@ -31,12 +31,22 @@ public class SizeBoundFloatStatsWindow extends SizeBoundWindow<Double> {
 	private double median;
 	private int count;
 	private boolean processed;
+	private boolean fullStat = true;
 	
 	/**
 	 * @param maxSize
 	 */
 	public SizeBoundFloatStatsWindow(int maxSize) {
 		super(maxSize);
+	}
+	
+	/**
+	 * @param maxSize
+	 * @param fullStat
+	 */
+	public SizeBoundFloatStatsWindow(int maxSize, boolean fullStat) {
+		super(maxSize);
+		this.fullStat = fullStat;
 	}
 	
 	/* (non-Javadoc)
@@ -51,34 +61,45 @@ public class SizeBoundFloatStatsWindow extends SizeBoundWindow<Double> {
 	 * @see org.hoidla.window.DataWindow#processFullWindow()
 	 */
 	public  void processFullWindow() {
-		sum = sumSq = 0;
+		sum = 0;
 		count = 0;
-		min = Double.MAX_VALUE;
-		max = Double.MIN_VALUE;
-		List<Double> values = new ArrayList<Double>();
-		for (Double val : dataWindow) {
-			sum += val;
-			sumSq += val * val;
-			if (val < min)
-				min = val;
-			if (val > max)
-				max = val;
-			values.add(val);
-			++count;
-		}
-		
-		mean = sum / count;
-		double var = sumSq / count - mean * mean;
-		var = (var * (count -1)) / count;
-		stdDev = Math.sqrt(var);
-		
-		Collections.sort(values);
-		int size = size();
-		int mid = size / 2;
-		if (size % 2 == 1) {
-			median = values.get(mid);
+		if (fullStat) {
+			//everything
+			sumSq = 0;
+			min = Double.MAX_VALUE;
+			max = Double.MIN_VALUE;
+			List<Double> values = new ArrayList<Double>();
+			for (Double val : dataWindow) {
+				sum += val;
+				sumSq += val * val;
+				if (val < min)
+					min = val;
+				if (val > max)
+					max = val;
+				values.add(val);
+				++count;
+			}
+			
+			mean = sum / count;
+			double var = sumSq / count - mean * mean;
+			var = (var * (count -1)) / count;
+			stdDev = Math.sqrt(var);
+			
+			Collections.sort(values);
+			int size = size();
+			int mid = size / 2;
+			if (size % 2 == 1) {
+				median = values.get(mid);
+			} else {
+				median = (values.get(mid -1) + values.get(mid)) / 2;
+			}
 		} else {
-			median = (values.get(mid -1) + values.get(mid)) / 2;
+			//mean only
+			for (Double val : dataWindow) {
+				sum += val;
+				++count;
+			}
+			mean = sum / count;
 		}
 		processed = true;
 	}
