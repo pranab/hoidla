@@ -1,0 +1,112 @@
+/*
+ * hoidla: various algorithms for sequence data solutions
+ * Author: Pranab Ghosh
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License"); you
+ * may not use this file except in compliance with the License. You may
+ * obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0 
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
+ * implied. See the License for the specific language governing
+ * permissions and limitations under the License.
+ */
+
+package org.hoidla.analyze;
+
+import java.util.Arrays;
+
+/**
+ * @author pranab
+ *
+ */
+public class ChangePointDetection {
+	private double[] data;
+	
+	public ChangePointDetection(double[] data) {
+		this.data = data;
+	}
+	
+	/**
+	 * @param winHalfSize
+	 * @param numChangePoints
+	 */
+	public ChangePoint[] detectByWindow(int winHalfSize, int numChangePoints) {
+		int size = data.length - 2 * winHalfSize;
+		ChangePoint[] changePoints = new ChangePoint[size];
+		int beg = 0;
+		int center = winHalfSize;
+		int end = 2 * winHalfSize;
+		
+		for (int i = 0; end < data.length; ++beg, ++center, ++end, ++i) {
+			double[] leftCdf = countSegment(beg, center);
+			double leftCost = findCost(leftCdf, beg, center);
+			double[] rightCdf = countSegment(center, end);
+			double rightCost = findCost(rightCdf, center, end);
+			double[] allCdf = countSegment(beg, end);
+			double allCost = findCost(allCdf, beg, end);
+			double disc = allCost - (leftCost + rightCost);
+			changePoints[i] = new ChangePoint(center, disc);
+		}
+		
+		//sort descending and return top
+		Arrays.sort(changePoints);
+		ChangePoint[] topChangePonts = null;
+		if (size <= numChangePoints) {
+			topChangePonts = changePoints;
+		} else {
+			topChangePonts = new ChangePoint[numChangePoints];
+			for (int i = 0; i < numChangePoints; ++i) {
+				topChangePonts[i] = changePoints[i];
+			}
+		}
+		
+		return topChangePonts;
+	}
+	
+	/**
+	 * @param beg
+	 * @param end
+	 * @return
+	 */
+	private double[] countSegment(int beg, int end) {
+		double[] counts = new double[data.length];
+		for (int i = 0; i < data.length; ++i) {
+			double count = 0;
+			for (int j = beg; j < end; ++j) {
+				if (data[j] < data[i]) {
+					++count;
+				} else if (data[j] == data[i]) {
+					count += 0.5;
+				}
+			}
+			count /= (end - beg);
+			counts[i] = count;
+		}
+		return counts;
+	}
+	
+	/**
+	 * @param cdf
+	 * @param beg
+	 * @param end
+	 * @return
+	 */
+	private double findCost(double[] cdf, int beg, int end) {
+		//max likelihood cost
+		double cost = 0;
+		for (int i = 0; i < cdf.length; ++i) {
+			double inv = 1.0 - cdf[i];
+			double temp = cdf[i] * Math.log(cdf[i]) + inv * Math.log(inv);
+			int j = i + 1;
+			temp /= ((j  - 0.5) * (cdf.length - j + 0.5));
+			cost += temp;
+		}
+		cost *= (beg - end);
+		return cost;
+	}
+
+}
