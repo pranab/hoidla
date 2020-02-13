@@ -1,5 +1,5 @@
 /*
- * hoidla: various streaming algorithms for Big Data solutions
+ * hoidla: various algorithms for Big Data solutions
  * Author: Pranab Ghosh
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); you
@@ -15,64 +15,62 @@
  * permissions and limitations under the License.
  */
 
+
 package org.hoidla.window;
+
+import org.chombo.math.Complex;
+import org.hoidla.analyze.FastFourierTransform;
+
 
 /**
  * @author pranab
  *
  */
-public class SizeBoundIntStatsWindow  extends SizeBoundWindow<Integer> {
-	private double mean;
-	private double stdDev;
-	private double sum;
-	private double sumSq;
-	private int count;
+public class FastFourierTransformWindow extends SizeBoundWindow<Double> {
+	private Complex[] fftOutput;
+	private double amp[];
+	private double[] phase;
 	
 	/**
 	 * @param maxSize
 	 */
-	public SizeBoundIntStatsWindow(int maxSize) {
-		super(maxSize);
+	public FastFourierTransformWindow(int maxSize) {
+		super(maxSize, maxSize, maxSize);
 	}
-	
 	
 	/* (non-Javadoc)
 	 * @see org.hoidla.window.DataWindow#processFullWindow()
 	 */
 	public  void processFullWindow() {
-		sum = sumSq = 0;
-		count = 0;
-		for (Integer val : dataWindow) {
-			sum += val;
-			sumSq += val * val;
-			++count;
+		Complex[] fftInput = new Complex[maxSize];
+		for (int i = 0; i < maxSize; ++i) {
+			fftInput[i] = new Complex(dataWindow.get(i), 0);
 		}
-		
-		mean = sum / count;
-		stdDev = Math.sqrt(sumSq / count - mean * mean);
+		fftOutput = FastFourierTransform.fft(fftInput);
+		amp = FastFourierTransform.findAmp(fftOutput);
+		phase = FastFourierTransform.findPhase(fftOutput);
 	}
 
 	/**
 	 * @return
 	 */
-	public double getMean() {
-		return mean;
+	public Complex[] getFft() {
+		return fftOutput;
 	}
 
 	/**
 	 * @return
 	 */
-	public double getStdDev() {
-		return stdDev;
+	public double[] getAmp() {
+		return amp;
 	}
 
 	/**
-	 * 
+	 * @return
 	 */
-	public void forcedProcess() {
-		if (!processed) {
-			 processFullWindow();
-			 processed = true;
-		}
+	public double[] getPhase() {
+		return phase;
 	}
+
+
 }

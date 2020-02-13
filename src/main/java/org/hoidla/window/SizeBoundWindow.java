@@ -30,6 +30,8 @@ public class SizeBoundWindow<T> extends DataWindow<T> implements Serializable {
 	protected int maxSize;
 	private int stepSize = 1;
 	private int processStepSize = 1;
+	protected boolean processed;
+
 	
 	public SizeBoundWindow() {
 	}
@@ -65,6 +67,7 @@ public class SizeBoundWindow<T> extends DataWindow<T> implements Serializable {
 	 */
 	@Override
 	public void add(T obj) {
+		processed = false;
 		if (null == dataWindow) {
 			dataWindow = new ArrayList<T>();
 		}
@@ -101,6 +104,7 @@ public class SizeBoundWindow<T> extends DataWindow<T> implements Serializable {
 		//process window data
 		if (count % processStepSize == 0) {
 			processFullWindow();
+			processed = true;
 		}
 	}
 	
@@ -174,4 +178,19 @@ public class SizeBoundWindow<T> extends DataWindow<T> implements Serializable {
 	public void setProcessStepSize(int processStepSize) {
 		this.processStepSize = processStepSize;
 	}
+	
+	/**
+	 * @return
+	 */
+	public boolean isProcessed() {
+		return processed;
+	}
+
+	/**
+	 * @param processed
+	 */
+	public void setProcessed(boolean processed) {
+		this.processed = processed;
+	}
+
 }

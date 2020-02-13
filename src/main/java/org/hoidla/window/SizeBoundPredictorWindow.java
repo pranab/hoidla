@@ -37,7 +37,6 @@ public class SizeBoundPredictorWindow extends SizeBoundWindow<Double> {
 	private double[] weights;
 	private double expSmoothingFactor;
 	private double regressed;
-	private boolean processed;
 	private String predictor;
 	private String[] configParams;
 	private Forecaster forecaster;
@@ -194,19 +193,6 @@ public class SizeBoundPredictorWindow extends SizeBoundWindow<Double> {
 	 */
 	private void findForecast() {
 		forecasted = forecaster.forecast(dataWindow);
-	}
-	/**
-	 * @return
-	 */
-	public boolean isProcessed() {
-		return processed;
-	}
-
-	/**
-	 * @param processed
-	 */
-	public void setProcessed(boolean processed) {
-		this.processed = processed;
 	}
 	
 	/**

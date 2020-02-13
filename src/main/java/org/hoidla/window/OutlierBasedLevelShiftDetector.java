@@ -33,20 +33,34 @@ public class OutlierBasedLevelShiftDetector extends SizeBoundWindow<TimeStampedT
 	private boolean newLevelShift;
 	
 
+	/**
+	 * @param maxSize
+	 */
 	public OutlierBasedLevelShiftDetector(int maxSize) {
 		super(maxSize);
 	}
 	
+	/**
+	 * @param outlierLabel
+	 * @return
+	 */
 	public OutlierBasedLevelShiftDetector withOutlierLabel(String outlierLabel) {
 		this.outlierLabel = outlierLabel;
 		return this;
 	}
 	
+	/**
+	 * @param mean
+	 * @return
+	 */
 	public OutlierBasedLevelShiftDetector withMean(double mean) {
 		this.mean = mean;
 		return this;
 	}
 	
+	/**
+	 *
+	 */
 	public void processFullWindow() {
 		int normCount = 0;
 		int aboveCount = 0;

@@ -21,6 +21,7 @@ package org.hoidla.analyze;
 
 import org.chombo.math.Complex;
 import org.chombo.math.MathUtils;
+import org.chombo.util.BasicUtils;
 
 /**
  * fast fourier transforms
@@ -167,8 +168,60 @@ public class FastFourierTransform {
 		System.out.println();
 	}	
 	
+	/**
+	 * @param f
+	 * @return
+	 */
+	public static double[] findAmp(Complex[] f) {
+		double[] amp = new double[f.length];
+		for (int i = 0; i < f.length; ++i) {
+			amp[i] = f[i].abs();
+		}
+		
+		return amp;
+	}
 	
+	/**
+	 * @param f
+	 * @return
+	 */
+	public static double[] findPhase(Complex[] f) {
+		double[] amp = new double[f.length];
+		for (int i = 0; i < f.length; ++i) {
+			amp[i] = f[i].phase();
+		}
+		
+		return amp;
+	}
 	
+	/**
+	 * @param data
+	 * @return
+	 */
+	public static Complex[] createComplex(double[] data) {
+		Complex[] cmplxData = new Complex[data.length];
+		for (int i = 0; i < data.length; ++i) {
+			cmplxData[i] = new Complex(data[i], 0);
+		}
+		return cmplxData;
+	}
+	
+	/**
+	 * @param data
+	 * @return
+	 */
+	public static Complex[] createComplex(double[] xdata, double[] ydata) {
+		BasicUtils.assertCondition(xdata.length == ydata.length, "real and imaginary vectors are not of same length");
+		Complex[] cmplxData = new Complex[xdata.length];
+		for (int i = 0; i < xdata.length; ++i) {
+			cmplxData[i] = new Complex(xdata[i], ydata[i]);
+		}
+		return cmplxData;
+	}
+
+	/**
+	 * @param args
+	 */
 	public static void main(String[] args) { 
         int n = 8;
         Complex[] x = new Complex[n];

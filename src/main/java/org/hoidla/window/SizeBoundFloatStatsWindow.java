@@ -49,13 +49,6 @@ public class SizeBoundFloatStatsWindow extends SizeBoundWindow<Double> {
 		this.fullStat = fullStat;
 	}
 	
-	/* (non-Javadoc)
-	 * @see org.hoidla.window.DataWindow#add(java.lang.Object)
-	 */
-	public void add(Double value) {
-		processed = false;
-		super.add(value);
-	}
 	
 	/* (non-Javadoc)
 	 * @see org.hoidla.window.DataWindow#processFullWindow()
@@ -101,7 +94,6 @@ public class SizeBoundFloatStatsWindow extends SizeBoundWindow<Double> {
 			}
 			mean = sum / count;
 		}
-		processed = true;
 	}
 
 	/**
@@ -139,26 +131,14 @@ public class SizeBoundFloatStatsWindow extends SizeBoundWindow<Double> {
 		return median;
 	}
 
-	/**
-	 * @return
-	 */
-	public boolean isProcessed() {
-		return processed;
-	}
-
-	/**
-	 * @param processed
-	 */
-	public void setProcessed(boolean processed) {
-		this.processed = processed;
-	}
 	
 	/**
 	 * 
 	 */
 	public void forcedProcess() {
 		if (!processed) {
-			 processFullWindow();
+			processFullWindow();
+			processed = true;
 		}
 	}
 
