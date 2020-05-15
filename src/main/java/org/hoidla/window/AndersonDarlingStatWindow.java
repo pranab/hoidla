@@ -15,53 +15,55 @@
  * permissions and limitations under the License.
  */
 
+
 package org.hoidla.window;
 
 import org.hoidla.analyze.TwoSampleStatistic;
 
 /**
- * CramerVonMises 2 sample stat
+ * anderson darling 2 sample statistic
  * @author pranab
  *
  */
-public class CramerVonMisesStatWindow extends SizeBoundWindow<Double> {
+public class AndersonDarlingStatWindow extends SizeBoundWindow<Double> {
 	private double stat;
-	
+
 	/**
 	 * 
 	 */
-	public CramerVonMisesStatWindow() {
+	public AndersonDarlingStatWindow() {
 		super();
 	}
-	
+
 	/**
 	 * @param maxSize
 	 * @param stepSize
 	 */
-	public CramerVonMisesStatWindow(int maxSize, int stepSize) {
+	public AndersonDarlingStatWindow(int maxSize, int stepSize) {
 		super(maxSize, stepSize);
 	}
 
 	/**
 	 * @param maxSize
 	 */
-	public CramerVonMisesStatWindow(int maxSize) {
+	public AndersonDarlingStatWindow(int maxSize) {
 		super(maxSize);
 	}
-
+	
 	/* (non-Javadoc)
 	 * @see org.hoidla.window.DataWindow#processFullWindow()
 	 */
 	public  void processFullWindow() {
 		Double[] arr = new Double[maxSize];
 		arr = copy(arr);
-		stat = TwoSampleStatistic.getCramerVonMisesSta(arr, maxSize/2);
-	}
-	
+		stat = TwoSampleStatistic.andersonDarlingStatistic(arr, maxSize/2);
+	}	
+
 	/**
 	 * @return
 	 */
 	public double getStat() {
 		return stat;
 	}
+
 }
