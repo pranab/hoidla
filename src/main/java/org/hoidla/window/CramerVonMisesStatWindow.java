@@ -55,7 +55,7 @@ public class CramerVonMisesStatWindow extends SizeBoundWindow<Double> {
 	public  void processFullWindow() {
 		Double[] arr = new Double[maxSize];
 		arr = copy(arr);
-		stat = TwoSampleStatistic.getCramerVonMisesSta(arr, maxSize/2);
+		stat = TwoSampleStatistic.getCramerVonMisesStat(arr, maxSize/2);
 	}
 	
 	/**

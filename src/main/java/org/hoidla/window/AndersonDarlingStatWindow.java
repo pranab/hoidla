@@ -56,7 +56,7 @@ public class AndersonDarlingStatWindow extends SizeBoundWindow<Double> {
 	public  void processFullWindow() {
 		Double[] arr = new Double[maxSize];
 		arr = copy(arr);
-		stat = TwoSampleStatistic.andersonDarlingStatistic(arr, maxSize/2);
+		stat = TwoSampleStatistic.getAndersonDarlingStat(arr, maxSize/2);
 	}	
 
 	/**

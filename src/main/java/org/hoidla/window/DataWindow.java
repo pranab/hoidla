@@ -67,7 +67,15 @@ public abstract class DataWindow<T> {
 		++count;
 		expire();
 	}
-	
+
+	/**
+	 * @param arr
+	 * @return
+	 */
+	public T[] copy(T[] arr) {
+		return dataWindow.toArray(arr);
+	}
+
 	/**
 	 * 
 	 */

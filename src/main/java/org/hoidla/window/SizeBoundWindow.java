@@ -84,9 +84,6 @@ public class SizeBoundWindow<T> extends DataWindow<T> implements Serializable {
 		}
 	}
 	
-	public T[] copy(T[] arr) {
-		return dataWindow.toArray(arr);
-	}
 
 	/* (non-Javadoc)
 	 * @see org.hoidla.window.DataWindow#expire()

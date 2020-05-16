@@ -18,6 +18,8 @@ package org.hoidla.analyze;
 
 import java.util.Arrays;
 
+import org.chombo.mr.Histogram;
+import org.chombo.stats.HistogramStat;
 import org.chombo.util.Pair;
 
 /**
@@ -25,7 +27,12 @@ import org.chombo.util.Pair;
  * @author pranab
  *
  */
+/**
+ * @author pranab
+ *
+ */
 public class TwoSampleStatistic {
+	private static int NUM_BINS = 50;
 	
 	/**
 	 * @author pranab
@@ -71,12 +78,46 @@ public class TwoSampleStatistic {
 		return positionedValues;
 	}
 	
+	
 	/**
 	 * @param data
 	 * @param spPoint
 	 * @return
 	 */
-	public static double getCramerVonMisesSta(Double[] data, int spPoint){
+	public static double getKolmogorovSminovStat(Double[] data, int spPoint) {
+		int size = data.length;
+		double min = Double.MAX_VALUE;
+		double max = Double.MIN_VALUE;
+		for (double v : data) {
+			if (v < min) {
+				min = v;
+			} 
+			if (v > max) {
+				max = v;
+			} 
+		}
+		double binWidth = (max - min) / NUM_BINS;
+		
+		HistogramStat hist1 = new HistogramStat(binWidth);
+		for (int i = 0; i < spPoint; ++i) {
+			hist1.add(data[i]);
+		}
+		
+		HistogramStat hist2 = new HistogramStat(binWidth);
+		for (int i = spPoint; i < size; ++i) {
+			hist2.add(data[i]);
+		}
+		
+		double stat =  hist1.getKolmogorovSmirnovStatistic(hist2);
+		return stat;
+	}
+	
+	/**
+	 * @param data
+	 * @param spPoint
+	 * @return
+	 */
+	public static double getCramerVonMisesStat(Double[] data, int spPoint){
 		RankedValue[] positionedValues = getRankedValues(data);
 		int size = data.length;
 		double sum1 = 0;
@@ -106,16 +147,17 @@ public class TwoSampleStatistic {
 	 * @param spPoint
 	 * @return
 	 */
-	public static double andersonDarlingStatistic(Double[] data, int spPoint) {
+	public static double getAndersonDarlingStat(Double[] data, int spPoint) {
 		int size = data.length;
-		Arrays.sort(data);
+		Double[] clonedData = Arrays.copyOf(data, size);
+		Arrays.sort(clonedData);
 		int[] ranks = new int[size];
 		
 		//number of data point in the first sample below the ith ranked data in total sample
 		for (int i = 0; i < size; ++i) {
 			int count = 0;
 			for(int j = 0; j < spPoint; ++j) {
-				if (data[j] <= data[i]) {
+				if (data[j] <= clonedData[i]) {
 					++count;
 				}
 			}
