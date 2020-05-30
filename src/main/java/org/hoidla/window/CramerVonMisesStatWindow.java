@@ -24,9 +24,7 @@ import org.hoidla.analyze.TwoSampleStatistic;
  * @author pranab
  *
  */
-public class CramerVonMisesStatWindow extends SizeBoundWindow<Double> {
-	private double stat;
-	
+public class CramerVonMisesStatWindow extends SizeBoundStatWindow {
 	/**
 	 * 
 	 */
@@ -56,12 +54,7 @@ public class CramerVonMisesStatWindow extends SizeBoundWindow<Double> {
 		Double[] arr = new Double[maxSize];
 		arr = copy(arr);
 		stat = TwoSampleStatistic.getCramerVonMisesStat(arr, maxSize/2);
+		processed = true;
 	}
 	
-	/**
-	 * @return
-	 */
-	public double getStat() {
-		return stat;
-	}
 }

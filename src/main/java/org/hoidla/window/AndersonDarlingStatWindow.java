@@ -25,9 +25,7 @@ import org.hoidla.analyze.TwoSampleStatistic;
  * @author pranab
  *
  */
-public class AndersonDarlingStatWindow extends SizeBoundWindow<Double> {
-	private double stat;
-
+public class AndersonDarlingStatWindow extends SizeBoundStatWindow {
 	/**
 	 * 
 	 */
@@ -57,13 +55,7 @@ public class AndersonDarlingStatWindow extends SizeBoundWindow<Double> {
 		Double[] arr = new Double[maxSize];
 		arr = copy(arr);
 		stat = TwoSampleStatistic.getAndersonDarlingStat(arr, maxSize/2);
+		processed = true;
 	}	
-
-	/**
-	 * @return
-	 */
-	public double getStat() {
-		return stat;
-	}
 
 }

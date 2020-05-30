@@ -24,8 +24,7 @@ import org.hoidla.analyze.TwoSampleStatistic;
  * @author pranab
  *
  */
-public class KolmogorovSminovStatWindow extends SizeBoundWindow<Double> {
-	private double stat;
+public class KolmogorovSminovStatWindow extends SizeBoundStatWindow {
 
 	public KolmogorovSminovStatWindow() {
 		super();
@@ -50,13 +49,7 @@ public class KolmogorovSminovStatWindow extends SizeBoundWindow<Double> {
 		Double[] arr = new Double[maxSize];
 		arr = copy(arr);
 		stat = TwoSampleStatistic.getKolmogorovSminovStat(arr, maxSize/2);
+		processed = true;
 	}
 	
-	/**
-	 * @return
-	 */
-	public double getStat() {
-		return stat;
-	}
-
 }
