@@ -102,7 +102,7 @@ public class SizeBoundWindow<T> extends DataWindow<T> implements Serializable {
 	 */
 	private void process() {
 		//process window data
-		if (count % processStepSize == 0) {
+		if (isFull() && count % processStepSize == 0) {
 			processFullWindow();
 			processed = true;
 		}

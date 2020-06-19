@@ -18,9 +18,9 @@ package org.hoidla.analyze;
 
 import java.util.Arrays;
 
-import org.chombo.mr.Histogram;
 import org.chombo.stats.HistogramStat;
 import org.chombo.util.Pair;
+import org.chombo.util.BasicUtils;
 
 /**
  * Two sample statistic
