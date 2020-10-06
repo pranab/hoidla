@@ -119,24 +119,27 @@ public class TwoSampleStatistic {
 	 */
 	public static double getCramerVonMisesStat(Double[] data, int spPoint){
 		RankedValue[] positionedValues = getRankedValues(data);
+		
 		int size = data.length;
-		double sum1 = 0;
 		int sampSize1 = spPoint;
+		double sum1 = 0;
+		
 		for(int i = 0 ; i < sampSize1; ++i) {
 			double diff = positionedValues[i].getLeft() - (i + 1);
-			sum1 += diff * diff;
+			sum1 += (diff * diff);
 		}
 		sum1 *= sampSize1;
 		
-		double sum2 = 0;
 		int sampSize2 = size - spPoint;
+		double sum2 = 0;
 		for(int i = 0 ; i < sampSize2; ++i) {
 			double diff = positionedValues[sampSize1 + i].getLeft() - (i + 1);
-			sum2 += diff * diff;
+			sum2 += (diff * diff);
 		}
 		sum2 *= sampSize2;
 		
 		double u = sum1 + sum2;
+		//System.out.println("u " + BasicUtils.formatDouble(u,3));
 		double pr = sampSize1 * sampSize2;
 		double stat = u / (pr * size) - (4.0 * pr - 1.0) / (6.0 * size);
 		return stat;

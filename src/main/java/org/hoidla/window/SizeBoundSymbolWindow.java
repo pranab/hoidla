@@ -19,6 +19,11 @@ package org.hoidla.window;
 
 public class SizeBoundSymbolWindow extends  SizeBoundWindow<String> {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 8672259887806607007L;
+
 	public SizeBoundSymbolWindow(int maxSize) {
 		super(maxSize);
 	}

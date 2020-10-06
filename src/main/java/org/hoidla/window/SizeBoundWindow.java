@@ -74,13 +74,14 @@ public class SizeBoundWindow<T> extends DataWindow<T> implements Serializable {
 		if (addFirst) {
 			dataWindow.add(obj);
 			++count;
-			process();
+			//System.out.println("added to window count " + count);
 			slide();
+			process();
 		} else {
+			slide();
 			process();
 			dataWindow.add(obj);
 			++count;
-			slide();
 		}
 	}
 	
@@ -102,7 +103,7 @@ public class SizeBoundWindow<T> extends DataWindow<T> implements Serializable {
 	 */
 	private void process() {
 		//process window data
-		if (isFull() && count % processStepSize == 0) {
+		if (isFull() && (count % processStepSize) == 0) {
 			processFullWindow();
 			processed = true;
 		}
@@ -134,6 +135,7 @@ public class SizeBoundWindow<T> extends DataWindow<T> implements Serializable {
 	 * @see org.hoidla.window.DataWindow#isFull()
 	 */
 	public boolean isFull() {
+		//System.out.println("window size " + dataWindow.size());
 		return dataWindow.size() == maxSize;
 	}
 
