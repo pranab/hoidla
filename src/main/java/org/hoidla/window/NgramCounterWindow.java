@@ -32,7 +32,7 @@ public class NgramCounterWindow extends SizeBoundSymbolWindow {
 	private static final long serialVersionUID = 4567074911259665894L;
 	private boolean isFull = false;
 	private int ngramSize;
-	private Map<String[], Integer> counts = new HashMap<String[], Integer>();
+	private Map<String[], Integer> counts = null;
 	private String earliest = null;
 
 	public NgramCounterWindow(int maxSize, int ngramSize) {
@@ -54,7 +54,7 @@ public class NgramCounterWindow extends SizeBoundSymbolWindow {
 	 * @see org.hoidla.window.DataWindow#processFullWindow()
 	 */
 	public  void processFullWindow() {
-		counts.clear();
+		counts = new HashMap<String[], Integer>();
 		if (!isFull) {
 			//first time full, return all counts
 			for (int i = 0; i < maxSize - ngramSize; ++i) {
@@ -92,7 +92,7 @@ public class NgramCounterWindow extends SizeBoundSymbolWindow {
 	/**
 	 * @return
 	 */
-	public Map<String[], Integer> getCounts() {
+	public Map<String[], Integer> getNgramCounts() {
 		return counts;
 	}
 }
