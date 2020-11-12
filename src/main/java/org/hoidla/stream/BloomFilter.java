@@ -41,7 +41,7 @@ public class BloomFilter {
 		
 		hashFamilySize = (int)Math.round(c *  bitVectorSize / maxSetSize) ;
 		filter = new BitSet(bitVectorSize);
-		hashFamily = new Hashing.MultiHashFamily(bitVectorSize, hashFamilySize);
+		hashFamily = new Hashing.MultiHashFamily(hashFamilySize, bitVectorSize);
 	}
 
 	/**
